@@ -34,13 +34,15 @@ setwd("C:/lab/")
 #Mac users: setwd("Users/yourname/lab"
 #Linux users: setwd("~/lab")
 
+#import data
 covid <- read.table("covid_agg.csv", head=TRUE ) #the second argument means that the first line isn't data, but is just the title 
-                                                 # head= TRUE or head=T
+                                                 #head=TRUE or head=T
 head(covid)
+
 attach(covid)
 plot(country,cases)
-
 #plot(covid$country, covid$cases)
+
 #this graph doesn't show all the countries, so we have to change type of graph
 plot(country,cases, las=0) #las=0 parallel labels to axes
 plot(country,cases, las=1) #las=1 horizontal labels to axes
@@ -51,10 +53,39 @@ plot(country,cases, las=3) #las=3 vertical labels to axes
 plot(country,cases, las=3, cex.axis=0.5) 
 
 #plot spatially with ggplot 
-#3 component:DATA, set of AESTHETIC MAPPING (variables in the data and visual properties), GEOMETRICAL layer
-
 install.packages("ggplot2")
 library(ggplot2)
+data(mpg)
+head(mpg)
+
+####save project
+
+
+#### load the previous data "spatial.RData"
+
+load("spatial.RData")
+ls() #list: to show all the data we have
+
+#if it's not just installed : intall.packaged("ggplot2")
+library(ggplot2) #require(ggplot2)
+
+data(mpg)
+head(mpg)
+
+#3 component:DATA, set of AESTHETIC MAPPING (variables in the data and visual properties), GEOMETRICAL layer
+
+ggplot(mpg, aes(x=displ,y=hwy))+geom_point() #(first: data, second: aes(x variable= displ, yvariable) ) + third: geometry: geom_point
+ggplot(mpg, aes(x=displ,y=hwy))+geom_line() #changing in type of graph: linear graph
+ggplot(mpg, aes(x=displ,y=hwy))+geom_polygon() 
+
+head(covid)
+
+# ggplot of covid
+ggplot(covid, aes(x=lon,y=lat,size=cases))+geom_point() 
+#size= the size of the point changes according to the n° of cases in each country
+
+
+
 
 
 
