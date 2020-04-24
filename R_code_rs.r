@@ -128,7 +128,66 @@ plotRGB(p224r63_2011, r=3, g=4, b=2, stretch="Lin")
 
 plotRGB(p224r63_2011, r=3, g=2, b=4, stretch="Lin")
 
+############################################################################ 
 
+setwd("C:/lab/")
+load("rs.RData")
+ls()
+
+library(raster)
+p224r63_1988_masked <- brick("p224r63_1988_masked.grd")
+
+plot(p224r63_1988_masked)
+
+#if there are some problems with the 2011 image: p224r63_2011_masked<- brick("p224r63_2011_masked.grd") 
+
+# EXERCISE: plot in visible RGB 321 both images
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=3, g=2, b=1, stretch="Lin")
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="Lin")
+
+# EXERCISE: plot in visible RGB 432 both images
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="Lin")
+
+#enhance the noise!
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988_masked, r=4, g=3, b=2, stretch="hist")
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="hist")
+
+#DVI= NIR - RED
+
+#plotRGB
+# Bands of Landsat
+# B1: blue band
+# B2: green band
+# B3: red band B3_sre
+# B4: NIR band  B4_sre
+
+dvi2011 <- p224r63_2011_masked$B4_sre - p224r63_2011_masked$B3_sre
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+plot(dvi2011)
+
+#EXERCISE:  dvi for 1988
+dvi1988 <- p224r63_1988_masked$B4_sre - p224r63_1988_masked$B3_sre
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+plot(dvi1988)
+
+# to see difference from one year to other
+diff <- dvi2011 - dvi1988
+
+# Effect of changing scale 
+# changing the grain (=resolution= dimension of the pixels)
+# RESEMPLING= changing size of pixel 
+
+p224r63_2011res <- aggregate( p224r63_2011_masked, fact=10) # fact= increase the pixel * 10
+p224r63_2011res100 <- aggregate( p224r63_2011_masked, fact=100)
+
+par(mfrow=c(3,1))
+plotRGB(p224r63_2011_masked, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res100, r=4, g=3, b=2, stretch="Lin")
 
 
 
