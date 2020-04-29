@@ -70,6 +70,10 @@ dev.off()
 cld <- colorRampPalette(c('blue','white','red'))(100) 
 plot(difdvi, col=cld)
 
+hist(difdvi)
+
+
+
 
 
 
