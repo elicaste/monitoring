@@ -88,23 +88,6 @@ cl <- colorRampPalette(c('yellow','violet','black'))(100) #
 plotRGB(clad, 1,2,3, stretch="lin")
 plot(sd_clad, col=cl)
 
-q()
-
-
-cl <- colorRampPalette(c('yellow','violet','black'))(100) #
-
-
-plot()
-
-
-plotRGB(clad, 1,2,3, stretch="lin")
-
-
-plot(sd_clad, col=cl)
-# plot(sd_clad_agg, col=cl)
-
-#we saw 
-
 dev.off()
 q()
 
