@@ -84,7 +84,7 @@ plot(sd_clad_agg,col=cl)  #cladonia set aggregated
 
 #plot the calculation 
 par(mfrow=c(1,2)) 
-cl <- colorRampPalette(c('yellow','violet','black'))(100) #
+cl <- colorRampPalette(c('yellow','violet','black'))(100) 
 plotRGB(clad, 1,2,3, stretch="lin")
 plot(sd_clad, col=cl)
 
