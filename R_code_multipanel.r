@@ -1,11 +1,11 @@
+### R_code_multipanel.r
 ### Multipanel in R: the second lecture of monitoring Ecosystem
 
 install.packages("sp")
-install.packages("GGally")      #this is used for the function ggpairs()
-                                # it's a packages that we use after
+install.packages("GGally") #this is used for the function ggpairs() 
 
-library(sp)                     #require(sp) doeas the same 
-library(GGally)                 #used for the other package installed
+library(sp) #require(sp) is the same 
+library(GGally) 
 
 data(meuse) #there is a dataset available named meuse
 attach (meuse)
@@ -25,7 +25,7 @@ plot(cadmium,zinc,pch=15,col="red",cex=2)
 #plot(x,cadmium)
 #plot(x,zinc)
 #plot...
-#plot isn't a god idea, so we use PAIRS(meuse)
+#plot isn't a god idea, so we use pairs(meuse)
 
 pairs(meuse)
 
@@ -35,18 +35,18 @@ pairs(meuse)
 pairs(~ cadmium+copper+lead+zinc, data=meuse)  
 
 #grouping variabiles 
-# ~ called tilde --> blocnum alt+126
-#comma separates different arguments
+# ~ called "tilde" --> blocnum alt+126
+# comma separates different arguments
 
 pairs(meuse[,3:6])
-#name of dataset + make the subset of the dataset  "," comma means "strart from" ":" means "untile"
+#name of dataset + make the subset of the dataset  "," comma means "start from" ":" means "until"
 #it is another way to to pairs(~ cadmium+copper+lead+zinc, data=meuse) 
 
-#Exercise: prettify this graph = modify the characteristics of the graph
+#EXERCISE: prettify this graph = modify the characteristics of the graph
 
 pairs(meuse[,3:6], col="blue", pch=4, cex=1)
 
-#go up at the beginning of the code and istall another package
+#go up at the beginning of the code and istall another package: GGally
 #GGally package will prettify the graph
 #install the package and use the library(GGally)
 
