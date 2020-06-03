@@ -1,4 +1,4 @@
-# R_code_pcs_remote_sensing.r
+### R_code_pcs_remote_sensing.r
 
 setwd("/Users/utente/lab")
 library(raster)
@@ -8,14 +8,14 @@ library(ggplot2)
 
 p224r63_2011 <- brick("p224r63_2011_masked.grd")
 
-#b1 blue
-#b2 green
-#b3 red
-#b4 NIR
-#b5 SWIR
-#b6 thermal infrared 
-#b7 SWIR
-#b8 panchromatic
+#B1 blue
+#B2 green
+#B3 red
+#B4 NIR
+#B5 SWIR
+#B6 thermal infrared 
+#B7 SWIR
+#B8 panchromatic
 
 #RGB: 
 plotRGB(p224r63_2011, r=5, g=4, b=3, stretch="Lin")
