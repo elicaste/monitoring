@@ -1,4 +1,4 @@
-# R_code_snow.r
+### R_code_snow.r
 
 #set the working directory
 setwd("C:/lab/") 
@@ -7,19 +7,18 @@ install.packages("ncdf4") #to read the netCDF files
 library(ncdf4)
 library(raster)
 
-#images downloaded by Copernicus dataset
+#image downloaded by Copernicus dataset
 snowmay <- raster("c_gls_SCE_202005260000_NHEMI_VIIRS_V1.0.1.nc") #it can appear a warning message: cannot process these parts of the CRS. No problem, we are using only a part of the extent 
 
 cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
 
-#Exercise: plot snow cover with the cl palette
-plot(snowmay,col=cl)
-#we can see the parts covered by snow
+#EXERCISE: plot snow cover with the cl palette
+plot(snowmay,col=cl) #we can see the parts covered by snow
 
 #import snow data 
 #set the new working directory 
-
 setwd("C:/lab/snow")
+
 #upload the files
 snow2000r <- raster("snow2000r.tif")
 snow2005r <- raster("snow2005r.tif")
