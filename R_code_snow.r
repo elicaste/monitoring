@@ -49,25 +49,42 @@ plot(snow.multitemp,col=cl) # we have all the plot together without using the pa
 
 source("prediction.r") #we use the script in R 
 
-  
-
-par(mfrow=c(1,2))
-plot(snow.multitemp$snow2000r, col=cl)
-plot(snow.multitemp$snow2020r, col=cl)
-
-par(mfrow=c(1,2))
-plot(snow.multitemp$snow2000r, col=cl, zlim=c(0,250))
-plot(snow.multitemp$snow2020r, col=cl, zlim=c(0,250))
-
-difsnow = snow.multitemp$snow2020r - snow.multitemp$snow2000r
-cldiff <- colorRampPalette(c('blue','white','red'))(100) 
-plot(difsnow, col=cldiff)
-
-# prediction
-# go to IOL and downloand prediction.r into the folder snow
-# source("prediction.r")
-# plot(predicted.snow.2025.norm, col=cl)
-# since the code needs time, you can ddownload predicted.snow.2025.norm.tif from iol in the Data
-
+# since the code needs time we can download predicted.snow.2025.norm.tif from iol in the Data
 predicted.snow.2025.norm <- raster("predicted.snow.2025.norm.tif")
 plot(predicted.snow.2025.norm, col=cl)
+
+############ day 2
+#set again the working directory
+setwd("C:/lab/snow")
+
+#EXERCISE: import the snow cover images altogether
+rlist <- list.files(pattern="snow")
+import <- lapply(rlist, raster)
+snow.multitemp <- stack(import)
+cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
+plot(snow.multitemp, col=cl)
+
+#load prediction file 
+prediction <- raster("predicted.2025.norm.tif")
+plot(prediction, col=cl) #snow cover will be present only in the northern part of the world 
+
+#export output
+#you made the calculation and you wat to send the output
+writeRaster(prediction, "final.tif") #in the folder "snow" you have the file named "final.tif"
+final.stack <- stack(snow.multitemp, prediction)
+plot(final.stack, col=cl) #plot all the images together 
+
+#export the R graph as a pdf
+pdf("my_final_graph.pdf")
+plot(final.stack, col=cl)
+dev.off()
+
+#export the R graph as a png
+png(("my_final_graph.pdf")
+plot(final.stack, col=cl)
+dev.off()
+
+rlist_prediction <- list.files(pattern="20") 
+import_prediction<- lapply(rlist_prediction, raster)
+snow.multitemporal <- stack(import_prediction) #stack function: to create a multitemporal imaage 
+plot(snow.multitemporal,col=cl) 
