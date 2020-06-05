@@ -36,6 +36,6 @@ boxplot(EN,outline=F, horizontal=T, axes=T)
 # plot 
 plot(EN$EN_0001, EN$EN_0013)
  
-# we can compare the pixels of 2 stituations plotting the 2 images together in order to see in the NO2 decreases o increases in a certain pixel
+# we can compare each pixels of 2 stituations plotting the 2 images in order to see if NO2 decreases o increases in each pixel
 plot(EN$EN_0001, EN$EN_0013) 
 abline(0,1,col="red") #most of the point are under the line, that means that the NO2 decreases
