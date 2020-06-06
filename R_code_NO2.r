@@ -39,3 +39,13 @@ plot(EN$EN_0001, EN$EN_0013)
 # we can compare each pixels of 2 stituations plotting the 2 images in order to see if NO2 decreases o increases in each pixel
 plot(EN$EN_0001, EN$EN_0013) 
 abline(0,1,col="red") #most of the point are under the line, that means that the NO2 decreases
+
+
+############ do the same with snow images (see the snow file!)
+setwd("C:/lab/snow/")
+rlist <- list.files(pattern="snow")
+import <- lapply(rlist, raster)
+snow.multitemp <- stack(import)
+
+plot(snow.multitemp$snow2010r,snow.multitemp$snow2020r) #strange plot! 
+abline(0,1,col="red")
