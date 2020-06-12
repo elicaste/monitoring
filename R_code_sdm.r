@@ -40,7 +40,7 @@ points(species[species$Occurrence == 1,], pch=16)
 #make the model
 d<-sdmData(train=species, predictors=preds) #training set=insitu data(species set make previously), predictors=where the sp are predicted to be (stack of all of the variables) 
 d #to see what there is inside 
-m1<-sdm(Occurrence ~ elevation + precipitation + temperature + vegetation, data=d, methods='glm') 
+m1<-sdm(Occurrence~elevation+precipitation+temperature+vegetation, data=d, methods="glm") 
 p1<-predict(m1, newdata=preds)
 plot(p1, col=cl)
 points(species[species$Occurrence == 1,], pch=16)
