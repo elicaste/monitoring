@@ -44,3 +44,5 @@ m1<-sdm(Occurrence~elevation+precipitation+temperature+vegetation, data=d, metho
 p1<-predict(m1, newdata=preds)
 plot(p1, col=cl)
 points(species[species$Occurrence == 1,], pch=16)
+s1 <- stack(preds,p1)
+plot(s1, col=cl)
