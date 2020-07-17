@@ -15,7 +15,23 @@ library(rgdal) # package for geospatial analysis
 library(RStoolbox)
 library(gdalUtils) #to convert hdf file 
 
-# data of LAND TEMPERATURE 
+# 1. temperature --> see if change through the time 
+#                    scaricare ogni mese per 7 anni 
+#                    media annuale -> plot per vedere l'andamento dal 2014 al 2020
+
+
+# 2. vegetation cover --> Fraction of green Vegetation Cover
+#                         The Fraction of Vegetation Cover (FCover) corresponds to the fraction of ground covered by green vegetation. 
+#                         Practically, it quantifies the spatial extent of the vegetation. 
+#                         Because it is independent from the illumination direction and it is sensitive to the vegetation amount, 
+#                         FCover is a very good candidate for the replacement of classical vegetation indices for the monitoring of ecosystems.
+#                    scaricare ogni mese per 7 anni   
+#                    media annuale -> plot per vedere l'andamento dal 2014 al 2020
+# 3. plot RGB 
+
+# data of LAND TEMPERATURE : https://search.earthdata.nasa.gov/downloads/2296543603/collections/225898/links 
+# BISOGNA ANCORA SCEGLIERE QUALI DATI 
+#CONVERTIRE FILE HDF PER ESSERE LETTI 
 # to quikly import all the data together use the the lapply function 
 setwd("C:/lab/temp/")
 watertemp_list<- list.files(pattern = "AQUA_MODIS.2009")
@@ -26,7 +42,7 @@ cl <- colorRampPalette(c("blue","green","yellow", "orange","red"))(10000)
 plot(watertemp.multitemp, col=cl)
 
 
-#zoom on the Gulf of Maine 
+#zoom on California
 ext <- c(-80,-50, 25,50)
 zoom(watertemp.multitemp$Sea.Surface.Temperature.1 , ext=ext, col=cl)
 
@@ -58,6 +74,9 @@ plot(watertemp_maine9, col=cl)
 plot(watertemp_maine10, col=cl)
 plot(watertemp_maine11, col=cl)
 plot(watertemp_maine12, col=cl)
+
+# see the difference between 2020 and 2000
+difftemp <- 
 
 
 
