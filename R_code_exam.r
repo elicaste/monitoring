@@ -24,9 +24,9 @@
 
 # --------------------------------- 1. R code first
 
-install.packages("sp")
-library(sp)
-data(meuse)
+install.packages("sp") #shows the points in a map
+library(sp) # attach an add-on package
+data(meuse) # to load specific dataset
 
 #let's see how the meuse dataset is structured
 meuse 
@@ -41,7 +41,7 @@ attach(meuse) #the function attach allows to access variables of a data.frame (m
 plot(zinc,copper) 
 plot(zinc,copper,col="green") #modify the color of the symbols 
 plot(zinc,copper,col="green",pch=19) #pch is used to specify point shapes
-plot(zinc,copper,col="green",pch=19,cex=2) #symbols are scaled: 1=default, 1.5 is 50%largers, 0.5=is 50% smaller
+plot(zinc,copper,col="green",pch=19,cex=2) #cex: symbols are scaled: 1=default, 1.5 is 50%largers, 0.5=is 50% smaller
 
 ########################################################################
 ########################################################################
@@ -160,7 +160,7 @@ plot(cadmium,zinc,pch=15,col="red",cex=2)
 #plot(x,zinc)
 #plot...
 #plot isn't a god idea --> we use pairs(meuse)
-pairs(meuse)
+pairs(meuse) # create a matrix of scatterplot
 
 #the result is a multipanel: all the graphs are shown in only one figure 
 #in case you receive the error "the size is too large", you have to reshape with the mouse the graph window
@@ -187,9 +187,12 @@ ggpairs(meuse[,3:6])
 
 # --------------------------------- 4. R code point pattern analysis (density map)
 
-install.packages("spatstat")
+install.packages("spatstat") 
+# Spatial Point Pattern Analysis: statystical analysis of spatial point pattern
+
 library(spatstat)
 
+# attach the Covid dataset
 attach(covid)
 head(covid)
 
@@ -198,9 +201,9 @@ covids <-ppp(lon,lat,c(-180,180), c(-90,90))
 # ppp(x,y, range of longiture, range of latitude) -> point pattern dataset in the two-dimensional plane
 
 # without attaching the covid set
-# the ppp commang becomes: covids <-ppp(covid$lon, covid$lat,c(-180,180), c(-90,90))  
+# the ppp command becomes: covids <-ppp(covid$lon, covid$lat,c(-180,180), c(-90,90))  
 
-#######FUNCTION DENSITY : how much dense are the points in space?
+#######FUNCTION DENSITY : how dense are the points in space?
 d<-density(covids)
 
 plot(d) #to show the density graph
@@ -269,7 +272,7 @@ setwd("C:/lab/")
 biomes <- read.table("biomes.csv", head=T, sep=",") #in the biomes there is an header (so T=true), the values are separated by comma
 head(biomes) #or view(biomes) -> to view the dataset 
 
-# how the species are related eachother?
+# how the species are related to each other?
 multivar <- decorana(biomes) # DEtrended CORrrespondence ANAlysis = DECORANA
 plot(multivar)
 
@@ -297,7 +300,7 @@ ordispider(multivar, type, col=1:4, label=T)
 ########################################################################
 
 # --------------------------------- 6. R code rs (remote sensing)
-#R code for remote sensing data analysis - per analisi di immagini satellitali
+#R code for remote sensing data analysis - per analisi di immagini satellitari
 
 setwd("C:/lab/") 
 
@@ -338,7 +341,7 @@ clb <- colorRampPalette(c('dark green','bgreen','light green'))(100)
 plot(p224r63_2011$B2_sre, col=clb)  
 
 # B3: red band
-#R code for remote sensing data analysis - per analisi di immagini satellitali
+#R code for remote sensing data analysis - per analisi di immagini satellitari
 
 setwd("C:/lab/") 
 
@@ -730,7 +733,7 @@ writeRaster( copNDVI, "copNDVI.tif")
 # 5.3 MB
 
 # to make the level plot of the faPAR
-levelplot(faPAR10) #faPAR = fraction of the solar radiation absorbed by live leaves 
+levelplot(faPAR10) #faPAR = fraction of the solar radiation absorbed by living leaves 
 
 ########## regression model between faPAR and NDVI
 erosion <-  c(12,14,16,24,26,40, 55,67) #ex. amount of erosion in a certain area
@@ -909,7 +912,7 @@ plotRGB(EN, r=1, g=7, b=13,stretch="lin") #1st image of the stack is 0001, 7th i
 
 #different map between the two situations 
 dif <- EN$EN_0013 - EN$EN_0001
-cld <-colorRampPalette(c('blue','white','red'))(100) #red means high differences,blue means lower difference between the 2 periods
+cld <-colorRampPalette(c('blue','white','red'))(100) #red means high differences, blue means lower difference between the 2 periods
 plot(dif,col=cld) 
 
 #quantitative measure of the decreasing of NO2
@@ -950,7 +953,7 @@ library(ncdf4)
 library(raster)
 
 #image downloaded by Copernicus dataset
-snowmay <- raster("c_gls_SCE_202005260000_NHEMI_VIIRS_V1.0.1.nc") #it can appear a warning message: cannot process these parts of the CRS. No problem, we are using only a part of the extent 
+snowmay <- raster("c_gls_SCE_202005260000_NHEMI_VIIRS_V1.0.1.nc") #a warning message may appear: cannot process these parts of the CRS. No problem, we are using only a part of the extent 
 
 cl <- colorRampPalette(c('darkblue','blue','light blue'))(100) 
 
@@ -968,7 +971,7 @@ snow2010r <- raster("snow2010r.tif")
 snow2015r <- raster("snow2015r.tif")
 snow2020r <- raster("snow2020r.tif")
 
-#to plot all the data together we us the par function
+#to plot all the data together we use the par function
 par(mfrow=c(2,3)) #multiframe row 
 plot(snow2000r, col=cl)
 plot(snow2005r, col=cl)
@@ -1028,7 +1031,7 @@ dev.off()
 
 rlist_prediction <- list.files(pattern="20") 
 import_prediction<- lapply(rlist_prediction, raster)
-snow.multitemporal <- stack(import_prediction) #stack function: to create a multitemporal imaage 
+snow.multitemporal <- stack(import_prediction) #stack function: to create a multitemporal image 
 plot(snow.multitemporal,col=cl) 
 
 ########################################################################
