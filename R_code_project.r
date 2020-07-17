@@ -26,4 +26,38 @@ cl <- colorRampPalette(c("blue","green","yellow", "orange","red"))(10000)
 plot(watertemp.multitemp, col=cl)
 
 
+#zoom on the Gulf of Maine 
+ext <- c(-80,-50, 25,50)
+zoom(watertemp.multitemp$Sea.Surface.Temperature.1 , ext=ext, col=cl)
+
+#cut the previous image 
+watertemp_maine1<-crop(watertemp.multitemp$Sea.Surface.Temperature.1, ext)
+watertemp_maine2<-crop(watertemp.multitemp$Sea.Surface.Temperature.2, ext)
+watertemp_maine3<-crop(watertemp.multitemp$Sea.Surface.Temperature.3, ext)
+watertemp_maine4<-crop(watertemp.multitemp$Sea.Surface.Temperature.4, ext)
+watertemp_maine5<-crop(watertemp.multitemp$Sea.Surface.Temperature.5, ext)
+watertemp_maine6<-crop(watertemp.multitemp$Sea.Surface.Temperature.6, ext)
+watertemp_maine7<-crop(watertemp.multitemp$Sea.Surface.Temperature.7, ext)
+watertemp_maine8<-crop(watertemp.multitemp$Sea.Surface.Temperature.8, ext)
+watertemp_maine9<-crop(watertemp.multitemp$Sea.Surface.Temperature.9, ext)
+watertemp_maine10<-crop(watertemp.multitemp$Sea.Surface.Temperature.10, ext)
+watertemp_maine11<-crop(watertemp.multitemp$Sea.Surface.Temperature.11, ext)
+watertemp_maine12<-crop(watertemp.multitemp$Sea.Surface.Temperature.12, ext)
+
+#plot all the 2002 water temperature in the Gulf of Maine
+par(mfrow=c(3,4))
+plot(watertemp_maine1, col=cl)
+plot(watertemp_maine2, col=cl)
+plot(watertemp_maine3, col=cl)
+plot(watertemp_maine4, col=cl)
+plot(watertemp_maine5, col=cl)
+plot(watertemp_maine6, col=cl)
+plot(watertemp_maine7, col=cl)
+plot(watertemp_maine8, col=cl)
+plot(watertemp_maine9, col=cl)
+plot(watertemp_maine10, col=cl)
+plot(watertemp_maine11, col=cl)
+plot(watertemp_maine12, col=cl)
+
+
 
