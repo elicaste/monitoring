@@ -37,23 +37,16 @@ library(gdalUtils) #to convert hdf file
 #                                                                    https://search.earthdata.nasa.gov/downloads/2296543603/collections/225898/links  
 
 setwd("C:/lab/Land_temperature")
-# to open a hdf it needs the library(gdalUtils)
-# cause there are lots of file, to import them I use a loop 
-land_temp<- dir(pattern = ".hdf")
-land_temp #visualise all the hdf files
-land_temp_name <- substr(land_temp,1,37)
-land_temp_name <- paste0("LandTemp", land_temp, ".tif")
-land_temp_name # visualise the new files name 
-i <- 1
-for (i in 1:37){
-  sds <- get_subdatasets(land_temp[i])
-  gdal_translate(sds[1], dst_dataset = land_temp_name[i])
-}
-
+landtemp_list<- list.files(pattern = "LST") #select all the file whose name contains "FCOVER"
+landtemp_list #see the files name 
+import_landtemp<- lapply(landtemp_list, raster) 
+landtemp.multitemp<- stack(import_landtemp)
 
 #zoom on California
-ext <- c(-80,-50, 25,50)
-zoom(watertemp.multitemp$Sea.Surface.Temperature.1 , ext=ext, col=cl)
+extCal <- c(-125,-105, 30,50)
+cl_temp <- colorRampPalette(c("blue", "lightblue", "yellow", "orange", "red"))(100)
+zoom(landtemp.multitemp$Fraction.of.Valid.Observations.1 , ext=extCal, col=cl_temp)
+
 
 #cut the previous image 
 veg_cover1<-crop(watertemp.multitemp$Sea.Surface.Temperature.1, ext)
