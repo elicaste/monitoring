@@ -7,13 +7,15 @@ install.packages("ncdf4")
 install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
-
+install.packages("RasterLayer")
+install.packages("plot.matrix")
 library(raster) ## package for raster manipulation: imports a single layer, yet satellite images are made of more than one layer
 library(rasterVis)
 library(ncdf4) # package for netcdf manipulation
 library(rgdal) # package for geospatial analysis
 library(RStoolbox)
 library(gdalUtils) #to convert hdf file 
+library(plot.matrix)
 
 # 1. temperature --> see if change through the time 
 #                    scaricare ogni mese per 7 anni 
@@ -28,13 +30,10 @@ library(gdalUtils) #to convert hdf file
 #                    scaricare ogni mese per 4 anni   
 #                    media annuale -> plot per vedere l'andamento dal 2017 al 2020
 # 3. plot RGB e NIR 
-# 4. vedo effetti di questi cambiamenti 
-
-
+# 4. vedo effetti di questi cambiamenti
 
 
 ######################################### data of LAND TEMPERATURE : import file efrom earthdata.nasa.gov     
-#                                                                    https://search.earthdata.nasa.gov/downloads/2296543603/collections/225898/links  
 
 setwd("C:/lab/Land_temperature")
 landtemp_list<- list.files(pattern = "LST") #select all the file whose name contains "FCOVER"
@@ -42,45 +41,64 @@ landtemp_list #see the files name
 import_landtemp<- lapply(landtemp_list, raster) 
 landtemp.multitemp<- stack(import_landtemp)
 
-#zoom on California
-extCal <- c(-125,-105, 30,50)
+#zoom on the zone near San Francisco
+extCal <- c(-124,-121, 37,39)
 cl_temp <- colorRampPalette(c("blue", "lightblue", "yellow", "orange", "red"))(100)
 zoom(landtemp.multitemp$Fraction.of.Valid.Observations.1 , ext=extCal, col=cl_temp)
 
-
 #cut the previous image 
-veg_cover1<-crop(watertemp.multitemp$Sea.Surface.Temperature.1, ext)
-veg_cover2<-crop(watertemp.multitemp$Sea.Surface.Temperature.2, ext)
-veg_cover3<-crop(watertemp.multitemp$Sea.Surface.Temperature.3, ext)
-watertemp_maine4<-crop(watertemp.multitemp$Sea.Surface.Temperature.4, ext)
-watertemp_maine5<-crop(watertemp.multitemp$Sea.Surface.Temperature.5, ext)
-watertemp_maine6<-crop(watertemp.multitemp$Sea.Surface.Temperature.6, ext)
-watertemp_maine7<-crop(watertemp.multitemp$Sea.Surface.Temperature.7, ext)
-watertemp_maine8<-crop(watertemp.multitemp$Sea.Surface.Temperature.8, ext)
-watertemp_maine9<-crop(watertemp.multitemp$Sea.Surface.Temperature.9, ext)
-watertemp_maine10<-crop(watertemp.multitemp$Sea.Surface.Temperature.10, ext)
-watertemp_maine11<-crop(watertemp.multitemp$Sea.Surface.Temperature.11, ext)
-watertemp_maine12<-crop(watertemp.multitemp$Sea.Surface.Temperature.12, ext)
+land_temp_201706<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.1, extCal)
+land_temp_201707<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.2, extCal)
+land_temp_201708<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.3, extCal)
+land_temp_201709<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.4, extCal)
+land_temp_201710<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.5, extCal)
+land_temp_201711<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.6, extCal)
+land_temp_201712<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.7, extCal)
+land_temp_201801<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.8, extCal)
+land_temp_201802<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.9, extCal)
+land_temp_201803<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.10, extCal)
+land_temp_201804<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.11, extCal)
+land_temp_201805<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.12, extCal)
+land_temp_201806<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.13, extCal)
+land_temp_201807<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.14, extCal)
+land_temp_201808<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.14, extCal)
+land_temp_201809<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.16, extCal)
+land_temp_201810<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.17, extCal)
+land_temp_201811<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.18, extCal)
+land_temp_201812<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.19, extCal)
+land_temp_201901<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.20, extCal)
+land_temp_201902<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.21, extCal)
+land_temp_201903<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.22, extCal)
+land_temp_201904<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.23, extCal)
+land_temp_201905<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.24, extCal)
+land_temp_201906<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.25, extCal)
+land_temp_201907<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.26, extCal)
+land_temp_201908<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.27, extCal)
+land_temp_201909<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.28, extCal)
+land_temp_201910<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.29, extCal)
+land_temp_201911<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.30, extCal)
+land_temp_201912<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.31, extCal)
+land_temp_202001<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.32, extCal)
+land_temp_202002<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.33, extCal)
+land_temp_202003<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.34, extCal)
+land_temp_202004<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.35, extCal)
+land_temp_202005<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.36, extCal)
+land_temp_202006<-crop(landtemp.multitemp$Fraction.of.Valid.Observations.37, extCal)
 
-#plot all the 2002 water temperature in the Gulf of Maine
-par(mfrow=c(3,4))
-plot(watertemp_maine1, col=cl)
-plot(watertemp_maine2, col=cl)
-plot(watertemp_maine3, col=cl)
-plot(watertemp_maine4, col=cl)
-plot(watertemp_maine5, col=cl)
-plot(watertemp_maine6, col=cl)
-plot(watertemp_maine7, col=cl)
-plot(watertemp_maine8, col=cl)
-plot(watertemp_maine9, col=cl)
-plot(watertemp_maine10, col=cl)
-plot(watertemp_maine11, col=cl)
-plot(watertemp_maine12, col=cl)
+#convert single raster layer to matrix
+land_temp_201706_matrix <- raster::as.matrix(land_temp_201706) 
 
+plot.matrix(land_temp_201706_matrix)
+
+saveDataset(land_temp_201706_matrix)
+plot(land_temp_201706_matrix)
+image(as.matrix(land_temp_201706))
+land_temp_201706_matrix <- raster2matrix(land_temp_201706)
 # see the difference between 2020 and 2000
 difftemp <- 
-  
 
+  
+  
 
 ######################################### data of VEGETATION COVER: import file from Copernicus 
 # to quikly import all the data together use the the lapply function 
