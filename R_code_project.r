@@ -145,8 +145,50 @@ cldiff<- colorRampPalette(c("blue", "black", "yellow"))(100)
 plot(diff_veg_cover_2017_2020, col=cldiff)
 
 ######################################### RGB and NDVI analysis 
+#import 2018 images
+setwd("C:/lab/ES_images2018")
+rlist_2018<- list.files(pattern="2018")
+rlist_2018
+import_images_2018 <- lapply(rlist_2018, raster)
+images_2018 <- stack(import_images_2018)
+cl <- colorRampPalette(c('red','orange','yellow'))(100) 
+plot(images_2018, col=cl)
+
+#import 2020 images
+setwd("C:/lab/ES_images2020")
+rlist_2020 <- list.files(pattern="2020")
+rlist_2020
+import_images_202 <- lapply(rlist_2020, raster)
+images_2020 <- stack(import_images_2020)
+plot(images_2020, col=cl)
+
+# RGB : B2 = blue, B3 = green, B4 = red, B8 = NIR, B11 = SWIR
+# pot in RGB visible 321 both images
+par(mfrow=c(2,1))
+plotRGB(images_2018, r=3, g=2, b=1, stretch="Lin")
+plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin") 
+
+# plot in false colour RGB 432 both images
+par(mfrow=c(2,1))
+plotRGB(images_2018, r=4, g=3, b=2, stretch="Lin")
+plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin") 
+
+# Mode2: multivariate analysis
+par(mfrow=c(2,1))
+plotRGB(p224r63_1988, r=4, g=3, b=2, stretch="hist")
+plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="hist") 
 
 
+
+# Let's change the grain (dimension of pixel) of our images  # res: resempling
+p224r63_2011res <- aggregate(p224r63_2011, fact=10)   
+p224r63_2011res100 <- aggregate(p224r63_2011, fact=100)
+# fact: amount of time we want to increase our images (10 time the image)
+     
+par(mfrow=c(3,1))
+plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res, r=4, g=3, b=2, stretch="Lin")
+plotRGB(p224r63_2011res100, r=4, g=3, b=2, stretch="Lin")
 
 # from the comparison between 2017 and 2020 it's possible to see that some zones are changed 
 # download from Copernicus the burned area 
