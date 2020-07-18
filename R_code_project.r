@@ -37,45 +37,19 @@ library(gdalUtils) #to convert hdf file
 #                                                                    https://search.earthdata.nasa.gov/downloads/2296543603/collections/225898/links  
 
 setwd("C:/lab/Land_temperature")
-# to open a NASA HDF file use get_subdatasets() 
-sds <- get_subdatasets ("MOD11C3.A2017152.006.2017187193442.hdf")
-#To retrieve data from dataset, use readGDAL().
-d5 <- readGDAL(sds[6], options=c("RASTERXDIM=4","RASTERYDIM=3","RASTERBDIM=2","RASTER4DIM=1","RASTER5DIM=0"))
+# to open a hdf it needs the library(gdalUtils)
+# cause there are lots of file, to import them I use a loop 
+land_temp<- dir(pattern = ".hdf")
+land_temp #visualise all the hdf files
+land_temp_name <- substr(land_temp,1,37)
+land_temp_name <- paste0("LandTemp", land_temp, ".tif")
+land_temp_name # visualise the new files name 
+i <- 1
+for (i in 1:37){
+  sds <- get_subdatasets(land_temp[i])
+  gdal_translate(sds[1], dst_dataset = land_temp_name[i])
+}
 
-
-nc <- nc_open("MOD11C3.A2017152.006.2017187193442.hdf")
-library(gdalUtils)
-# Get a list of sds names
-sds <- get_subdatasets("MOD11C3.hdf")
-
-# Isolate the name of the first sds
-name <- sds[1]
-filename <- 'name/of/output/file.tif'
-gdal_translate(sds[1], dst_dataset = filename)
-# Load the Geotiff created into R
-r <- raster(filename)
-
-
-sds <- get_subdatasets("MOD11C3.A2017152.006.2017187193442.hdf")
-# Isolate the name of the first sds
-temp_jun20017 <- sds[1]
-temp_jun20017 <- 'temp_jun20017.tif'
-gdal_translate(sds[1], dst_dataset = temp_jun20017)
-# Load the Geotiff created into R
-temp_jun20017 <- raster(temp_jun20017)
-plot(temp_jun20017)
-
-
-
-#CONVERTIRE FILE HDF PER ESSERE LETTI 
-# to quikly import all the data together use the the lapply function 
-setwd("C:/lab/temp/")
-watertemp_list<- list.files(pattern = "AQUA_MODIS.2009")
-watertemp_list #see the files name 
-import<- lapply(watertemp_list, raster) 
-watertemp.multitemp<- stack(import)
-cl <- colorRampPalette(c("blue","green","yellow", "orange","red"))(10000)
-plot(watertemp.multitemp, col=cl)
 
 #zoom on California
 ext <- c(-80,-50, 25,50)
