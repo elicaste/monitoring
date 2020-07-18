@@ -145,6 +145,7 @@ cldiff<- colorRampPalette(c("blue", "black", "yellow"))(100)
 plot(diff_veg_cover_2017_2020, col=cldiff)
 
 ######################################### RGB and NDVI analysis 
+
 #import 2018 images
 setwd("C:/lab/ES_images2018")
 rlist_2018<- list.files(pattern="2018")
@@ -152,7 +153,7 @@ rlist_2018
 import_images_2018 <- lapply(rlist_2018, raster)
 images_2018 <- stack(import_images_2018)
 cl <- colorRampPalette(c('red','orange','yellow'))(100) 
-plot(images_2018, col=cl)
+plot(images_2018, col=cl) # to see all the bands 
 
 #import 2020 images
 setwd("C:/lab/ES_images2020")
@@ -160,35 +161,42 @@ rlist_2020 <- list.files(pattern="2020")
 rlist_2020
 import_images_202 <- lapply(rlist_2020, raster)
 images_2020 <- stack(import_images_2020)
-plot(images_2020, col=cl)
+plot(images_2020, col=cl) #to see all the bands
 
 # RGB : B2 = blue, B3 = green, B4 = red, B8 = NIR, B11 = SWIR
-# pot in RGB visible 321 both images
-par(mfrow=c(2,1))
-plotRGB(images_2018, r=3, g=2, b=1, stretch="Lin")
-plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin") 
 
-# plot in false colour RGB 432 both images
+# pot in RGB visible 321 both images: how the human eyes really see
 par(mfrow=c(2,1))
-plotRGB(images_2018, r=4, g=3, b=2, stretch="Lin")
-plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin") 
+plotRGB(images_2018, r=3, g=2, b=1, stretch="Lin", main = "2018", axes=TRUE )
+plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin", main = "2020", axes=TRUE) 
+
+# plot in false colour RGB 432 both images -> NIR in top: vegetation being coloured in red
+par(mfrow=c(2,1))
+plotRGB(images_2018, r=4, g=3, b=2, stretch="Lin", main = "2018", axes=TRUE)
+plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020", axes=TRUE) 
 
 # Mode2: multivariate analysis
 par(mfrow=c(2,1))
-plotRGB(p224r63_1988, r=4, g=3, b=2, stretch="hist")
-plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="hist") 
+plotRGB(images_2018, r=4, g=3, b=2, stretch="hist", main = "2018", axes=TRUE)
+plotRGB(images_2020, r=4, g=3, b=2, stretch="hist", main = "2020", axes=TRUE) 
 
+#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
+dvi2018 <- images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI - images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.
+dvi2020 <- images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI - images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.
 
+#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
+ndvi2018 <- dvi2018 / (images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI + images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.)
+ndvi2020 <- dvi2020 / (images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI + images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.)
 
-# Let's change the grain (dimension of pixel) of our images  # res: resempling
-p224r63_2011res <- aggregate(p224r63_2011, fact=10)   
-p224r63_2011res100 <- aggregate(p224r63_2011, fact=100)
-# fact: amount of time we want to increase our images (10 time the image)
-     
-par(mfrow=c(3,1))
-plotRGB(p224r63_2011, r=4, g=3, b=2, stretch="Lin")
-plotRGB(p224r63_2011res, r=4, g=3, b=2, stretch="Lin")
-plotRGB(p224r63_2011res100, r=4, g=3, b=2, stretch="Lin")
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+par(mfrow=c(2,1))
+plot(ndvi2018, col=cl)
+plot(ndvi2020, col=cl)
+
+# to see difference from one year to other
+diff_dvi <- dvi2020 - dvi2018
+cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
+plot(diff_dvi, col=cldiff)
 
 # from the comparison between 2017 and 2020 it's possible to see that some zones are changed 
 # download from Copernicus the burned area 
