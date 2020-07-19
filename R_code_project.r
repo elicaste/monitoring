@@ -238,24 +238,34 @@ images_2020 <- stack(import_images_2020)
 # B11 = SWIR
 # B12 = SWIR
 
-# pot in RGB visible 321 both images: how the human eyes really see   DA RIVEDERE!
+# pot in RGB visible 321 both images: how the human eyes really see  
+#True color composite uses visible light bands red (B04), green (B03) and blue (B02) in the corresponding red, green and blue color channels, 
+#resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.
 par(mfrow=c(2,1))
-plotRGB(images_2017, r=3, g=2, b=1, stretch="Lin", main = "2017", axes=TRUE)
-plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin", main = "2020", axes=TRUE)
+plotRGB(images_2017, r=4, g=3, b=2, stretch="Lin", main = "2017")
+plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020")
 
-# plot in false colour RGB 432 both images -> NIR in top: vegetation being coloured in red DA RIVEDERE!
+# plot in FALSE COLOR RGB 843 both images -> NIR in top: vegetation being coloured in red 
+# False color imagery is displayed in a combination of standard near infra-red, red and green band. 
+#False color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and healht, 
+#as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. 
+#Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
 par(mfrow=c(2,1))
-plotRGB(images_2017, r=4, g=3, b=2, stretch="Lin", main = "2017", axes=TRUE)
-plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020", axes=TRUE) 
+plotRGB(images_2017, r=8, g=4, b=3, stretch="Lin", main = "2017")
+plotRGB(images_2020, r=8, g=4, b=3, stretch="Lin", main = "2020")
 
 #DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-dvi2017 <- images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. - images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.
-dvi2020 <- images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. - images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.
+dvi2017 <- images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B08_.Raw. - images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B04_.Raw.
+dvi2020 <- images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B08_.Raw. - images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B04_.Raw.
+
+par(mfrow=c(2,1))
+plot(dvi2017, main = "DVI 2017")
+plot(dvi2020, main = "DVI 2020")
+
 
 #NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
-ndvi2017 <- dvi2017 / (images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. + images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.)
-ndvi2020 <- dvi2020 / (images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. + images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.)
-
+ndvi2017 <- dvi2017 / (images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B08_.Raw. + images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B04_.Raw.)
+ndvi2020 <- dvi2020 / (images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B08_.Raw. + images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B04_.Raw.)
 
 cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
 par(mfrow=c(2,1))
