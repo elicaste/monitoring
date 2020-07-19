@@ -158,7 +158,7 @@ plot(diff_veg_cover_2017_2020, col=cldiff)
 ######################################### RGB and NDVI analysis 
 
 #import 2018 images
-setwd("C:/lab/ES_images2018")
+setwd("C:/lab/EO_images2018")
 rlist_2018<- list.files(pattern="2018")
 rlist_2018
 import_images_2018 <- lapply(rlist_2018, raster)
@@ -167,14 +167,13 @@ cl <- colorRampPalette(c('red','orange','yellow'))(100)
 plot(images_2018, col=cl) # to see all the bands 
 
 #import 2020 images
-setwd("C:/lab/ES_images2020")
+setwd("C:/lab/EO_images2020")
 rlist_2020 <- list.files(pattern="2020")
 rlist_2020
 import_images_202 <- lapply(rlist_2020, raster)
 images_2020 <- stack(import_images_2020)
 plot(images_2020, col=cl) #to see all the bands
 
-# RGB : B2 = blue, B3 = green, B4 = red, B8 = NIR, B11 = SWIR
 
 # pot in RGB visible 321 both images: how the human eyes really see
 par(mfrow=c(2,1))
@@ -209,7 +208,62 @@ diff_dvi <- dvi2020 - dvi2018
 cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
 plot(diff_dvi, col=cldiff)
 
-# from the comparison between 2017 and 2020 it's possible to see that some zones are changed 
-# download from Copernicus the burned area 
 
+#import 2017-06-16 images
+setwd("C:/lab/EO_images20170616")
+rlist_2017<- list.files(pattern="2017")
+rlist_2017
+import_images_2017 <- lapply(rlist_2017, raster)
+images_2017 <- stack(import_images_2017)
+
+
+#import 2020-06-16 images
+setwd("C:/lab/EO_images20200616")
+rlist_2020<- list.files(pattern="2020")
+rlist_2020
+import_images_2020 <- lapply(rlist_2020, raster)
+images_2020 <- stack(import_images_2020)
+
+# Sentinel-2 bands
+# b1 = Coastal Aerosol
+# B2 = blue
+# B3 = green
+# B4 = red
+# B5 = Vegetation Red Edge
+# B6 = Vegetation Red Edge
+# B7 = Vegetation Red Edge
+# B8 = NIR
+# B9 = Water Vapour
+# B10 = SWIR-Cirrus
+# B11 = SWIR
+# B12 = SWIR
+
+# pot in RGB visible 321 both images: how the human eyes really see   DA RIVEDERE!
+par(mfrow=c(2,1))
+plotRGB(images_2017, r=3, g=2, b=1, stretch="Lin", main = "2018", axes=TRUE)
+plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin", main = "2020", axes=TRUE)
+
+# plot in false colour RGB 432 both images -> NIR in top: vegetation being coloured in red DA RIVEDERE!
+par(mfrow=c(2,1))
+plotRGB(images_2017, r=4, g=3, b=2, stretch="Lin", main = "2017", axes=TRUE)
+plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020", axes=TRUE) 
+
+#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
+dvi2017 <- images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. - images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.
+dvi2020 <- images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. - images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.
+
+#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
+ndvi2017 <- dvi2017 / (images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. + images_2017$X2017.06.16_00_00_._2017.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.)
+ndvi2020 <- dvi2020 / (images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B08_.Raw. + images_2020$X2020.06.16_00_00_._2020.06.16_23_59._Sentinel.3_S3OLCI._B04_.Raw.)
+
+
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+par(mfrow=c(2,1))
+plot(ndvi2017, col=cl)
+plot(ndvi2020, col=cl)
+
+# to see difference from one year to other
+diff_dvi <- dvi2020 - dvi2017
+cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
+plot(diff_dvi, col=cldiff)
 
