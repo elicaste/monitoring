@@ -209,16 +209,16 @@ cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
 plot(diff_dvi, col=cldiff)
 
 
-#import 2017-06-16 images
-setwd("C:/lab/EO_images20170616")
+#import 2017-07-09 images
+setwd("C:/lab/EO_images20170709")
 rlist_2017<- list.files(pattern="2017")
 rlist_2017
 import_images_2017 <- lapply(rlist_2017, raster)
 images_2017 <- stack(import_images_2017)
 
 
-#import 2020-06-16 images
-setwd("C:/lab/EO_images20200616")
+#import 2020-06-13 images
+setwd("C:/lab/EO_images20200613")
 rlist_2020<- list.files(pattern="2020")
 rlist_2020
 import_images_2020 <- lapply(rlist_2020, raster)
@@ -240,7 +240,7 @@ images_2020 <- stack(import_images_2020)
 
 # pot in RGB visible 321 both images: how the human eyes really see   DA RIVEDERE!
 par(mfrow=c(2,1))
-plotRGB(images_2017, r=3, g=2, b=1, stretch="Lin", main = "2018", axes=TRUE)
+plotRGB(images_2017, r=3, g=2, b=1, stretch="Lin", main = "2017", axes=TRUE)
 plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin", main = "2020", axes=TRUE)
 
 # plot in false colour RGB 432 both images -> NIR in top: vegetation being coloured in red DA RIVEDERE!
