@@ -1,5 +1,48 @@
 #R_code_project.r
-setwd("C:/lab/") #set the working director
+setwd("C:/lab/incendi") #set the working director
+
+# install all packages needed 
+install.packages ("raster") #package for the analysis and geographyc data manipulation 
+install.packages("rasterdiv")
+install.packages ("rasterVis") #package for visualize raster data 
+install.packages ("rgdal") #package for geospatial analysis 
+install.packages("ncdf4") #package for netcdf manipulation
+install.packages("rgdal")
+install.packages("RStoolbox")
+install.packages("gdalUtils")
+install.packages("plot.matrix")
+install.packages("RasterLayer")
+install.packages ("devtools") # Strumenti di pacchetto per rendere più facile lo sviluppo di pacchetti R
+
+# load the packages in the library 
+library(raster)
+library(rasterdiv)
+library(rasterVis)
+library(ncdf4) 
+library(rgdal)
+library(RStoolbox)
+library(gdalUtils) #to convert hdf file 
+library(plot.matrix)
+library(RasterLayer)
+library(devtools)
+
+install.packages ("maptools") # Pacchetto di strumenti per leggere e gestire oggetti spaziali
+install.packages ("rgeos") # Interfaccia per Geometry Engine - Open Source (GEOS)
+install.packages ("RCurl") # Fornisce funzioni per consentire di comporre richieste HTTP generali e di recuperare gli URI
+
+
+prefire2020<- "LC80010852017008LGN00" 	
+postfire2020<- "LC80010852017056LGN00" 
+prefire2013<- "LC80010852017008LGN00" 	
+postfire2013<- "LC80010852017056LGN00"
+
+lspre2013<- ReadLandsat8(prefire2013) #read images 2013 pre-fire
+lspost2013<- ReadLandsat8(postfire2013) #read  images 2013 post-fire
+lspre2020<- ReadLandsat8(prefire2020) #read  images 2020 pre-fire
+lspost2020<- ReadLandsat8(postfire2020) #read  images 2020 post-fire
+
+
+______________________________________________________________________________________________________________
 
 install.packages("rasterdiv")
 install.packages("rasterVis")
