@@ -25,6 +25,77 @@ library(plot.matrix)
 library(RasterLayer)
 
 ######################################### RGB and NDVI analysis 
+#create a list of raster layers to use (for 2018- June and August, and for 2020- June and August)
+
+#import 2018_June images
+setwd("C:/lab/California/2018_June")
+rlist_2018_June<- list.files(pattern="2018")
+rlist_2018_June 
+import_images_2018_June <- lapply(rlist_2018_June, raster)
+images_2018_June <- stack(import_images_2018_June)
+cl <- colorRampPalette(c('red','orange','yellow'))(100) 
+#plot(images_2018_June, col=cl) # to see all the bands
+
+#import 2018_August images
+setwd("C:/lab/California/2018_August")
+rlist_2018_August<- list.files(pattern="2018")
+rlist_2018_August 
+import_images_2018_August <- lapply(rlist_2018_August, raster)
+images_2018_August <- stack(import_images_2018_August)
+#plot(images_2018_August, col=cl) # to see all the bands
+
+#import 2020_June images
+setwd("C:/lab/California/2020_June")
+rlist_2020_June<- list.files(pattern="2020")
+rlist_2020_June 
+import_images_2020_June <- lapply(rlist_2020_June, raster)
+images_2020_June <- stack(import_images_2020_June)
+#plot(images_2020_June, col=cl) # to see all the bands
+
+#import 2020_August images
+setwd("C:/lab/California/2020_August")
+rlist_2020_August<- list.files(pattern="2020")
+rlist_2020_August 
+import_images_2020_August <- lapply(rlist_2020_August, raster)
+images_2020_August <- stack(import_images_2020_August)
+#plot(images_2020_August, col=cl) # to see all the bands
+
+# plot in RGB visible 2018 images
+par(mfrow=c(2,1))
+plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", main = "June 2018", axes=TRUE )
+plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", main = "August 2018", axes=TRUE) 
+
+# plot in RGB visible 2020 images
+par(mfrow=c(2,1))
+plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", main = "June 2020", axes=TRUE )
+plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", main = "August 2020", axes=TRUE) 
+
+#RGB (8,4,3)
+#False color imagery is displayed in a combination of standard near infra-red, red and green band.
+#It is most commonly used to assess plant density and healht, as plants reflect near infrared and green light, while absorbing red. 
+#Since they reflect more near infrared than green, plant-covered land appears deep red. 
+#Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
+
+# plot in false color 2018 images
+par(mfrow=c(3,1))
+falsecolor_2018_June<- plotRGB(images_2018_June, r=8, g=4, b=3, stretch="Lin", main = "June 2018", axes=TRUE )
+falsecolor_2018_August<- plotRGB(images_2018_August, r=8, g=4, b=3, stretch="Lin", main = "August 2018", axes=TRUE) 
+diff_falsecolor_2018<- falsecolor_2018_August-falsecolor_2018_June
+plot(diff_falsecolor_2018,) 
+
+# plot in false color 2020 images
+par(mfrow=c(3,1))
+falsecolor_2020_June<- plotRGB(images_2020_June, r=8, g=4, b=3, stretch="Lin", main = "June 2020", axes=TRUE )
+falsecolor_2020_August<- plotRGB(images_2020_August, r=8, g=4, b=3, stretch="Lin", main = "August 2020", axes=TRUE) 
+diff_falsecolor_2020<- falsecolor_2020_August-falsecolor_2020_June
+plot(diff_falsecolor_2020)
+
+
+
+
+################fino a qui
+
+######################################### RGB and NDVI analysis 
 
 #import 2018 images
 setwd("C:/lab/California/2018_June")
