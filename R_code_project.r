@@ -11,7 +11,6 @@ install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
 install.packages("plot.matrix")
-install.packages("RasterLayer")
 
 # load the packages in the library 
 library(raster)
@@ -22,7 +21,6 @@ library(rgdal)
 library(RStoolbox)
 library(gdalUtils) #to convert hdf file 
 library(plot.matrix)
-library(RasterLayer)
 
 ######################################### RGB and NDVI analysis 
 #create a list of raster layers to use (for 2018- June and August, and for 2020- June and August)
@@ -33,8 +31,7 @@ rlist_2018_June<- list.files(pattern="2018")
 rlist_2018_June 
 import_images_2018_June <- lapply(rlist_2018_June, raster)
 images_2018_June <- stack(import_images_2018_June)
-cl <- colorRampPalette(c('red','orange','yellow'))(100) 
-#plot(images_2018_June, col=cl) # to see all the bands
+images_2018_June_br <- brick(images_2018_June)
 
 #import 2018_August images
 setwd("C:/lab/California/2018_August")
@@ -42,7 +39,7 @@ rlist_2018_August<- list.files(pattern="2018")
 rlist_2018_August 
 import_images_2018_August <- lapply(rlist_2018_August, raster)
 images_2018_August <- stack(import_images_2018_August)
-#plot(images_2018_August, col=cl) # to see all the bands
+images_2018_August_br <- brick(images_2018_August)
 
 #import 2020_June images
 setwd("C:/lab/California/2020_June")
@@ -50,15 +47,16 @@ rlist_2020_June<- list.files(pattern="2020")
 rlist_2020_June 
 import_images_2020_June <- lapply(rlist_2020_June, raster)
 images_2020_June <- stack(import_images_2020_June)
-#plot(images_2020_June, col=cl) # to see all the bands
+images_2020_June_br <- brick(images_2020_June) # convert data into rasterbrick for faster processing
 
+# do the same for other moths and year
 #import 2020_August images
 setwd("C:/lab/California/2020_August")
 rlist_2020_August<- list.files(pattern="2020")
 rlist_2020_August 
 import_images_2020_August <- lapply(rlist_2020_August, raster)
 images_2020_August <- stack(import_images_2020_August)
-#plot(images_2020_August, col=cl) # to see all the bands
+images_2020_August_br <- brick(images_2020_August)
 
 # plot in RGB visible 2018 images
 par(mfrow=c(2,1))
@@ -87,9 +85,44 @@ plot(diff_falsecolor_2018,)
 par(mfrow=c(3,1))
 falsecolor_2020_June<- plotRGB(images_2020_June, r=8, g=4, b=3, stretch="Lin", main = "June 2020", axes=TRUE )
 falsecolor_2020_August<- plotRGB(images_2020_August, r=8, g=4, b=3, stretch="Lin", main = "August 2020", axes=TRUE) 
-diff_falsecolor_2020<- falsecolor_2020_August-falsecolor_2020_June
-plot(diff_falsecolor_2020)
+#diff_falsecolor_2020<- falsecolor_2020_August-falsecolor_2020_June
+#plot(diff_falsecolor_2020)
 
+# NDVI anlysis
+#The normalized difference vegetation index (NDVI) uses a ratio between near infrared and red light within the electromagnetic spectrum. 
+#To calculate NDVI, you use the following formula where NIR is near infrared light and red represents red light. 
+#NDVI= (NIR - Red) / (NIR + Red)
+#For your raster data, you will take the reflectance value in the red and near infrared bands to calculate the index.
+
+#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
+dvi2018_June <- images_2018_June$X2018.06.02.00_00_2018.06.02.23_59_Sentinel.2_L2A_B04_.Raw.
+  -images_2018_June
+dvi2020 <- 
+  
+#see the difference before and after the summer period - 2018
+diff_dvi <- dvi2020 - dvi2018
+cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
+plot(diff_dvi, col=cldiff)
+
+#see the difference before and after the summer period - 2020
+
+#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
+dvi2018 <- images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI - images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.
+dvi2020 <- images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI - images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.
+
+#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
+ndvi2018 <- dvi2018 / (images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI + images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.)
+ndvi2020 <- dvi2020 / (images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI + images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.)
+
+cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
+par(mfrow=c(2,1))
+plot(ndvi2018, col=cl)
+plot(ndvi2020, col=cl)
+
+# to see difference from one year to other
+diff_dvi <- dvi2020 - dvi2018
+cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
+plot(diff_dvi, col=cldiff)
 
 
 
