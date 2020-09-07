@@ -11,6 +11,7 @@ install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
 install.packages("plot.matrix")
+install.packages("RasterLayer")
 
 # load the packages in the library 
 library(raster)
@@ -21,12 +22,15 @@ library(rgdal)
 library(RStoolbox)
 library(gdalUtils) #to convert hdf file 
 library(plot.matrix)
+library(RasterLayer)
+library(rgeos)
+library(RColorBrewer)
 
 ######################################### RGB and NDVI analysis 
 #create a list of raster layers to use (for 2018- June and August, and for 2020- June and August)
 
 #import 2018_June images
-setwd("C:/lab/California/2018_June")
+setwd("C:/lab/California/2018_June_14")
 rlist_2018_June<- list.files(pattern="2018")
 rlist_2018_June 
 import_images_2018_June <- lapply(rlist_2018_June, raster)
@@ -34,7 +38,7 @@ images_2018_June <- stack(import_images_2018_June)
 images_2018_June_br <- brick(images_2018_June)
 
 #import 2018_August images
-setwd("C:/lab/California/2018_August")
+setwd("C:/lab/California/2018_August_28")
 rlist_2018_August<- list.files(pattern="2018")
 rlist_2018_August 
 import_images_2018_August <- lapply(rlist_2018_August, raster)
@@ -42,16 +46,15 @@ images_2018_August <- stack(import_images_2018_August)
 images_2018_August_br <- brick(images_2018_August)
 
 #import 2020_June images
-setwd("C:/lab/California/2020_June")
+setwd("C:/lab/California/2020_June_08")
 rlist_2020_June<- list.files(pattern="2020")
 rlist_2020_June 
 import_images_2020_June <- lapply(rlist_2020_June, raster)
 images_2020_June <- stack(import_images_2020_June)
 images_2020_June_br <- brick(images_2020_June) # convert data into rasterbrick for faster processing
 
-# do the same for other moths and year
 #import 2020_August images
-setwd("C:/lab/California/2020_August")
+setwd("C:/lab/California/2020_August_26")
 rlist_2020_August<- list.files(pattern="2020")
 rlist_2020_August 
 import_images_2020_August <- lapply(rlist_2020_August, raster)
@@ -60,13 +63,40 @@ images_2020_August_br <- brick(images_2020_August)
 
 # plot in RGB visible 2018 images
 par(mfrow=c(2,1))
-plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", main = "June 2018", axes=TRUE )
-plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", main = "August 2018", axes=TRUE) 
+plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", 
+        main = "June 2018", 
+        axes = TRUE)
+plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", 
+        main = "August 2018", 
+        axes = TRUE) 
 
 # plot in RGB visible 2020 images
 par(mfrow=c(2,1))
-plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", main = "June 2020", axes=TRUE )
-plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", main = "August 2020", axes=TRUE) 
+plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", 
+        main = "June 2020", 
+        axes = TRUE)
+plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", 
+        main = "August 2020", 
+        axes = TRUE) 
+
+#plot all the images together
+par(mfrow=c(2,2))
+plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", 
+        main = "June 2018", 
+        axes = TRUE)
+plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", 
+        main = "August 2018", 
+        axes = TRUE) 
+plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", 
+        main = "June 2020", 
+        axes = TRUE)
+plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", 
+        main = "August 2020", 
+        axes = TRUE) 
+#?????????????????
+# Remove water based colours
+bind_2018_August <- reclassify(images_2018_August, cbind(253:255, NA))
+
 
 #RGB (8,4,3)
 #False color imagery is displayed in a combination of standard near infra-red, red and green band.
@@ -94,161 +124,70 @@ falsecolor_2020_August<- plotRGB(images_2020_August, r=8, g=4, b=3, stretch="Lin
 #NDVI= (NIR - Red) / (NIR + Red)
 #For your raster data, you will take the reflectance value in the red and near infrared bands to calculate the index.
 
+# calculate NDVI using the red (band 1) and nir (band 4) bands
+NDVI_2018_June <- (images_2018_June_br[[8]] - images_2018_June_br[[4]]) / (images_2018_June_br[[8]] + images_2018_June_br[[4]])
+NDVI_2018_August <- (images_2018_August_br[[8]] - images_2018_August_br[[4]]) / (images_2018_August_br[[8]] + images_2018_August_br[[4]])
+NDVI_2020_June <- (images_2020_June_br[[8]] - images_2020_June_br[[4]]) / (images_2020_June_br[[8]] + images_2020_June_br[[4]])
+NDVI_2020_August <- (images_2020_August_br[[8]] - images_2020_August_br[[4]]) / (images_2020_August_br[[8]] + images_2020_August_br[[4]])
+
+# plot the data
+par(mfrow=c(2,2), 
+    mar = c(1, 1, 1, 1),
+    main = "NDVI" ,) #mar: plot with small margins
+plot(NDVI_2018_June, main = "NDVI  - June 2018", axes = FALSE, box = FALSE )
+plot(NDVI_2018_August, main = "NDVI  - August 2018",axes = FALSE, box = FALSE)
+plot(NDVI_2020_June, main = "NDVI  - June 2020",axes = FALSE, box = FALSE)
+plot(NDVI_2020_August, main = "NDVI  - August 2020",axes = FALSE, box = FALSE)
+
+
+
 #DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-dvi2018_June <- images_2018_June$X2018.06.02.00_00_2018.06.02.23_59_Sentinel.2_L2A_B04_.Raw.
-  -images_2018_June
-dvi2020 <- 
-  
-#see the difference before and after the summer period - 2018
-diff_dvi <- dvi2020 - dvi2018
-cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
-plot(diff_dvi, col=cldiff)
+DVI_2018_June <- (images_2018_June_br[[8]] - images_2018_June_br[[4]])
+DVI_2018_August <- (images_2018_August_br[[8]] - images_2018_August_br[[4]])
+DVI_2020_June <- (images_2020_June_br[[8]] - images_2020_June_br[[4]])
+DVI_2020_August <- (images_2020_August_br[[8]] - images_2020_August_br[[4]])
 
-#see the difference before and after the summer period - 2020
+#see the difference between before and after the summer period - 2018
+diff_DVI_2018 <- DVI_2018_August - DVI_2018_June
+cldiff<- colorRampPalette(c("lightblue", "lightyellow", "red"))(100)
+plot(diff_DVI_2018, col=cldiff,
+     main = "Difference in vegetation index 2018 \n August and June" ,
+     axes = FALSE, box = FALSE)
+# xlim = c(400, 1000), ylim = c(0,600)
 
-#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-dvi2018 <- images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI - images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.
-dvi2020 <- images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI - images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.
+#see the difference between before and after the summer period - 2020
+diff_DVI_2020 <- DVI_2020_August - DVI_2020_June
+plot(diff_DVI_2020, col=cldiff,
+     main = "Difference in vegetation index 2020 \n August and June" ,
+    box = FALSE)
+# axes = FALSE, xlim = c(400, 1000), ylim = c(0,600)
 
-#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
-ndvi2018 <- dvi2018 / (images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI + images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.)
-ndvi2020 <- dvi2020 / (images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI + images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.)
-
-cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
-par(mfrow=c(2,1))
-plot(ndvi2018, col=cl)
-plot(ndvi2020, col=cl)
-
-# to see difference from one year to other
-diff_dvi <- dvi2020 - dvi2018
-cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
-plot(diff_dvi, col=cldiff)
+#see the difference between 2018 and 2020
+diff_DVI_2018_2020 <- DVI_2020_August - DVI_2018_August
+plot(diff_DVI_2018_2020, col=cldiff,  
+     main = "Difference in vegetation index \n August 2020 and 2018" ,
+     xlim = c(400, 1000), ylim = c(0,600),
+     box = FALSE)
 
 
+# Zoom 
 
+# I don't need a resample because the bands have the same resolution
+May2020 <- stack(import)
+ext <- c(662000, 680000, 4710000, 4730000) # set the coordinates of the Park
+Parcomay <- crop(May2020, ext) # create a new image of the zoomed area
+
+
+# Quantitative estimation
+# plot!
+plot(ndvi_park_june, ndvi_park_july)
+abline(0,1, col="red") # y=a+bx
 ################fino a qui
 
-######################################### RGB and NDVI analysis 
-
-#import 2018 images
-setwd("C:/lab/California/2018_June")
-rlist_2018_June<- list.files(pattern="2018")
-rlist_2018_June 
-import_images_2018_June <- lapply(rlist_2018, raster)
-images_2018_June <- stack(import_images_2018_June)
-cl <- colorRampPalette(c('red','orange','yellow'))(100) 
-plot(images_2018:June, col=cl) # to see all the bands 
-
-#import 2020 images
-setwd("C:/lab/EO_images2020")
-rlist_2020 <- list.files(pattern="2020")
-rlist_2020
-import_images_202 <- lapply(rlist_2020, raster)
-images_2020 <- stack(import_images_2020)
-plot(images_2020, col=cl) #to see all the bands
 
 
-# pot in RGB visible 321 both images: how the human eyes really see
-par(mfrow=c(2,1))
-plotRGB(images_2018, r=3, g=2, b=1, stretch="Lin", main = "2018", axes=TRUE )
-plotRGB(images_2020, r=3, g=2, b=1, stretch="Lin", main = "2020", axes=TRUE) 
-
-# plot in false colour RGB 432 both images -> NIR in top: vegetation being coloured in red
-par(mfrow=c(2,1))
-plotRGB(images_2018, r=4, g=3, b=2, stretch="Lin", main = "2018", axes=TRUE)
-plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020", axes=TRUE) 
-
-# Mode2: multivariate analysis
-par(mfrow=c(2,1))
-plotRGB(images_2018, r=4, g=3, b=2, stretch="hist", main = "2018", axes=TRUE)
-plotRGB(images_2020, r=4, g=3, b=2, stretch="hist", main = "2020", axes=TRUE) 
-
-#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-dvi2018 <- images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI - images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.
-dvi2020 <- images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI - images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.
-
-#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
-ndvi2018 <- dvi2018 / (images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._NDVI + images_2018$X2018.06.14_00_00_._2018.06.14_23_59._Sentinel.2_S2L2A._B02_.Raw.)
-ndvi2020 <- dvi2020 / (images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._NDVI + images_2020$X2020.06.08_00_00_._2020.06.08_23_59._Sentinel.2_S2L2A._B02_.Raw.)
-
-cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
-par(mfrow=c(2,1))
-plot(ndvi2018, col=cl)
-plot(ndvi2020, col=cl)
-
-# to see difference from one year to other
-diff_dvi <- dvi2020 - dvi2018
-cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
-plot(diff_dvi, col=cldiff)
 
 
-#import 2017-07-09 images
-setwd("C:/lab/EO_images20170709")
-rlist_2017<- list.files(pattern="2017")
-rlist_2017
-import_images_2017 <- lapply(rlist_2017, raster)
-images_2017 <- stack(import_images_2017)
-
-
-#import 2020-06-13 images
-setwd("C:/lab/EO_images20200613")
-rlist_2020<- list.files(pattern="2020")
-rlist_2020
-import_images_2020 <- lapply(rlist_2020, raster)
-images_2020 <- stack(import_images_2020)
-
-# Sentinel-2 bands
-# b1 = Coastal Aerosol
-# B2 = blue
-# B3 = green
-# B4 = red
-# B5 = Vegetation Red Edge
-# B6 = Vegetation Red Edge
-# B7 = Vegetation Red Edge
-# B8 = NIR
-# B9 = Water Vapour
-# B10 = SWIR-Cirrus
-# B11 = SWIR
-# B12 = SWIR
-
-# pot in RGB visible 321 both images: how the human eyes really see  
-#True color composite uses visible light bands red (B04), green (B03) and blue (B02) in the corresponding red, green and blue color channels, 
-#resulting in a natural colored result, that is a good representation of the Earth as humans would see it naturally.
-par(mfrow=c(2,1))
-plotRGB(images_2017, r=4, g=3, b=2, stretch="Lin", main = "2017")
-plotRGB(images_2020, r=4, g=3, b=2, stretch="Lin", main = "2020")
-
-# plot in FALSE COLOR RGB 843 both images -> NIR in top: vegetation being coloured in red 
-# False color imagery is displayed in a combination of standard near infra-red, red and green band. 
-#False color composite using near infrared, red and green bands is very popular. It is most commonly used to assess plant density and healht, 
-#as plants reflect near infrared and green light, while absorbing red. Since they reflect more near infrared than green, plant-covered land appears deep red. 
-#Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
-par(mfrow=c(2,1))
-plotRGB(images_2017, r=8, g=4, b=3, stretch="Lin", main = "2017")
-plotRGB(images_2020, r=8, g=4, b=3, stretch="Lin", main = "2020")
-
-#DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-dvi2017 <- images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B08_.Raw. - images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B04_.Raw.
-dvi2020 <- images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B08_.Raw. - images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B04_.Raw.
-
-par(mfrow=c(2,1))
-plot(dvi2017, main = "DVI 2017")
-plot(dvi2020, main = "DVI 2020")
-
-
-#NDVI = DVI/NIR+red : Normalised Difference Vegetation Index
-ndvi2017 <- dvi2017 / (images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B08_.Raw. + images_2017$X2017.07.09_00_00_._2017.07.09_23_59._Sentinel.2_S2L2A._B04_.Raw.)
-ndvi2020 <- dvi2020 / (images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B08_.Raw. + images_2020$X2020.07.13_00_00_._2020.07.13_23_59._Sentinel.2_S2L2A._B04_.Raw.)
-
-cl <- colorRampPalette(c('darkorchid3','light blue','lightpink4'))(100) 
-par(mfrow=c(2,1))
-plot(ndvi2017, col=cl)
-plot(ndvi2020, col=cl)
-
-# to see difference from one year to other
-diff_dvi <- dvi2020 - dvi2017
-cldiff<- colorRampPalette(c("peachpuff", "mistyrose1", "darkorchid4"))(100)
-plot(diff_dvi, col=cldiff)
 
 
 
