@@ -10,8 +10,8 @@ install.packages("ncdf4") #package for netcdf manipulation
 install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
-install.packages("plot.matrix")
 install.packages("RasterLayer")
+install.packages("rLandsat8")
 
 # load the packages in the library 
 library(raster)
@@ -27,7 +27,7 @@ library(rgeos)
 library(RColorBrewer)
 
 ######################################### RGB and NDVI analysis 
-#create a list of raster layers to use (for 2018- June and August, and for 2020- June and August)
+#create a list of raster layers to use (for 2018- June and September, and for 2020- June and September)
 
 #import 2018_June images
 setwd("C:/lab/California/2018_June_14")
@@ -35,15 +35,19 @@ rlist_2018_June<- list.files(pattern="2018")
 rlist_2018_June 
 import_images_2018_June <- lapply(rlist_2018_June, raster)
 images_2018_June <- stack(import_images_2018_June)
-images_2018_June_br <- brick(images_2018_June)
+    #crop the images 
+    ext <- c(800, 1700, 0, 1000)
+    #zoom function
+    zoom(images_2018_June, ext=ext)
+images_2018_June_crop <- crop(images_2018_June, ext)
 
-#import 2018_August images
-setwd("C:/lab/California/2018_August_28")
-rlist_2018_August<- list.files(pattern="2018")
-rlist_2018_August 
-import_images_2018_August <- lapply(rlist_2018_August, raster)
-images_2018_August <- stack(import_images_2018_August)
-images_2018_August_br <- brick(images_2018_August)
+#import 2018_September images
+setwd("C:/lab/California/2018_September_17")
+rlist_2018_September<- list.files(pattern="2018")
+rlist_2018_September 
+import_images_2018_September <- lapply(rlist_2018_September, raster)
+images_2018_September <- stack(import_images_2018_September)
+images_2018_September_crop <- crop(images_2018_September, ext)
 
 #import 2020_June images
 setwd("C:/lab/California/2020_June_08")
@@ -51,52 +55,48 @@ rlist_2020_June<- list.files(pattern="2020")
 rlist_2020_June 
 import_images_2020_June <- lapply(rlist_2020_June, raster)
 images_2020_June <- stack(import_images_2020_June)
-images_2020_June_br <- brick(images_2020_June) # convert data into rasterbrick for faster processing
+images_2020_June_crop <- crop(images_2020_June, ext)
 
-#import 2020_August images
-setwd("C:/lab/California/2020_August_26")
-rlist_2020_August<- list.files(pattern="2020")
-rlist_2020_August 
-import_images_2020_August <- lapply(rlist_2020_August, raster)
-images_2020_August <- stack(import_images_2020_August)
-images_2020_August_br <- brick(images_2020_August)
+#import 2020_September images
+setwd("C:/lab/California/2020_September_1")
+rlist_2020_September<- list.files(pattern="2020")
+rlist_2020_September 
+import_images_2020_September <- lapply(rlist_2020_September, raster)
+images_2020_September <- stack(import_images_2020_September)
+images_2020_September_crop <- crop(images_2020_September, ext)
 
 # plot in RGB visible 2018 images
 par(mfrow=c(2,1))
-plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", 
+plotRGB(images_2018_June_crop, r=4, g=3, b=2, stretch="Lin", 
         main = "June 2018", 
         axes = TRUE)
-plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", 
-        main = "August 2018", 
+plotRGB(images_2018_September_crop, r=4, g=3, b=2, stretch="Lin", 
+        main = "September 2018", 
         axes = TRUE) 
 
 # plot in RGB visible 2020 images
 par(mfrow=c(2,1))
-plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", 
+plotRGB(images_2020_June_crop, r=4, g=3, b=2, stretch="Lin", 
         main = "June 2020", 
         axes = TRUE)
-plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", 
-        main = "August 2020", 
-        axes = TRUE) 
+plotRGB(images_2020_September_crop, r=4, g=3, b=2, stretch="Lin", 
+        main = "September 2020", 
+        axes = TRUE)
 
 #plot all the images together
 par(mfrow=c(2,2))
-plotRGB(images_2018_June, r=4, g=3, b=2, stretch="Lin", 
+  plotRGB(images_2018_June_crop, r=4, g=3, b=2, stretch="Lin", 
         main = "June 2018", 
         axes = TRUE)
-plotRGB(images_2018_August, r=4, g=3, b=2, stretch="Lin", 
-        main = "August 2018", 
+  plotRGB(images_2018_September_crop, r=4, g=3, b=2, stretch="Lin", 
+        main = "September 2018", 
         axes = TRUE) 
-plotRGB(images_2020_June, r=4, g=3, b=2, stretch="Lin", 
+  plotRGB(images_2020_June_crop, r=4, g=3, b=2, stretch="Lin", 
         main = "June 2020", 
         axes = TRUE)
-plotRGB(images_2020_August, r=4, g=3, b=2, stretch="Lin", 
-        main = "August 2020", 
-        axes = TRUE) 
-#?????????????????
-# Remove water based colours
-bind_2018_August <- reclassify(images_2018_August, cbind(253:255, NA))
-
+  plotRGB(images_2020_September_crop, r=4, g=3, b=2, stretch="Lin", 
+        main = "September 2020", 
+        axes = TRUE)
 
 #RGB (8,4,3)
 #False color imagery is displayed in a combination of standard near infra-red, red and green band.
@@ -105,18 +105,14 @@ bind_2018_August <- reclassify(images_2018_August, cbind(253:255, NA))
 #Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
 
 # plot in false color 2018 images
-par(mfrow=c(3,1))
-falsecolor_2018_June<- plotRGB(images_2018_June, r=8, g=4, b=3, stretch="Lin", main = "June 2018", axes=TRUE )
-falsecolor_2018_August<- plotRGB(images_2018_August, r=8, g=4, b=3, stretch="Lin", main = "August 2018", axes=TRUE) 
-diff_falsecolor_2018<- falsecolor_2018_August-falsecolor_2018_June
-plot(diff_falsecolor_2018,) 
+par(mfrow=c(1,3))
+  falsecolor_2018_June<- plotRGB(images_2018_June_crop, r=8, g=4, b=3, stretch="Lin", main = "June 2018" )
+  falsecolor_2018_September<- plotRGB(images_2018_September_crop, r=8, g=4, b=3, stretch="Lin", main = "September 2018") 
 
 # plot in false color 2020 images
-par(mfrow=c(3,1))
-falsecolor_2020_June<- plotRGB(images_2020_June, r=8, g=4, b=3, stretch="Lin", main = "June 2020", axes=TRUE )
-falsecolor_2020_August<- plotRGB(images_2020_August, r=8, g=4, b=3, stretch="Lin", main = "August 2020", axes=TRUE) 
-#diff_falsecolor_2020<- falsecolor_2020_August-falsecolor_2020_June
-#plot(diff_falsecolor_2020)
+par(mfrow=c(1,3))
+  falsecolor_2020_June<- plotRGB(images_2020_June_crop, r=8, g=4, b=3, stretch="Lin", main = "June 2020", axes=TRUE )
+  falsecolor_2020_September<- plotRGB(images_2020_September_crop, r=8, g=4, b=3, stretch="Lin", main = "September 2020", axes=TRUE) 
 
 # NDVI anlysis
 #The normalized difference vegetation index (NDVI) uses a ratio between near infrared and red light within the electromagnetic spectrum. 
@@ -124,88 +120,171 @@ falsecolor_2020_August<- plotRGB(images_2020_August, r=8, g=4, b=3, stretch="Lin
 #NDVI= (NIR - Red) / (NIR + Red)
 #For your raster data, you will take the reflectance value in the red and near infrared bands to calculate the index.
 
-# calculate NDVI using the red (band 1) and nir (band 4) bands
-NDVI_2018_June <- (images_2018_June_br[[8]] - images_2018_June_br[[4]]) / (images_2018_June_br[[8]] + images_2018_June_br[[4]])
-NDVI_2018_August <- (images_2018_August_br[[8]] - images_2018_August_br[[4]]) / (images_2018_August_br[[8]] + images_2018_August_br[[4]])
-NDVI_2020_June <- (images_2020_June_br[[8]] - images_2020_June_br[[4]]) / (images_2020_June_br[[8]] + images_2020_June_br[[4]])
-NDVI_2020_August <- (images_2020_August_br[[8]] - images_2020_August_br[[4]]) / (images_2020_August_br[[8]] + images_2020_August_br[[4]])
+# calculate NDVI using the red and nir bands
 
-# plot the data
+NDVI_2018_June <- (images_2018_June_crop[[8]] - images_2018_June_crop[[4]]) / (images_2018_June_crop[[8]] + images_2018_June_crop[[4]])
+NDVI_2018_September <- (images_2018_September_crop[[8]] - images_2018_September_crop[[4]]) / (images_2018_September_crop[[8]] + images_2018_September_crop[[4]])
+NDVI_2020_June <- (images_2020_June_crop[[8]] - images_2020_June_crop[[4]]) / (images_2020_June_crop[[8]] + images_2020_June_crop[[4]])
+NDVI_2020_September <- (images_2020_September_crop[[8]] - images_2020_September_crop[[4]]) / (images_2020_September_crop[[8]] + images_2020_September_crop[[4]])
+
+# plot the NDVI data
 par(mfrow=c(2,2), 
-    mar = c(1, 1, 1, 1),
-    main = "NDVI" ,) #mar: plot with small margins
-plot(NDVI_2018_June, main = "NDVI  - June 2018", axes = FALSE, box = FALSE )
-plot(NDVI_2018_August, main = "NDVI  - August 2018",axes = FALSE, box = FALSE)
-plot(NDVI_2020_June, main = "NDVI  - June 2020",axes = FALSE, box = FALSE)
-plot(NDVI_2020_August, main = "NDVI  - August 2020",axes = FALSE, box = FALSE)
+    mar = c(1, 1, 1, 1)) #mar: plot with small margins
+  plot(NDVI_2018_June, main = "NDVI  - June 2018", axes = FALSE, box = FALSE )
+  plot(NDVI_2018_September, main = "NDVI  - September 2018",axes = FALSE, box = FALSE)
+  plot(NDVI_2020_June, main = "NDVI  - June 2020",axes = FALSE, box = FALSE)
+  plot(NDVI_2020_September, main = "NDVI  - September 2020",axes = FALSE, box = FALSE)
 
 
+#see the difference between June and September - 2018
+diff_NDVI_2018 <- NDVI_2018_September - NDVI_2018_June
+  # color-palette for immages of comparison difference
+  cldiff<- colorRampPalette(c("black", "yellow"))(100)
+plot(diff_NDVI_2018, col=cldiff,
+     main = "Difference in normalized vegetation index 2018 \n September and June" ,
+     box = FALSE)
+
+#see the difference between June and September - 2020
+diff_NDVI_2020 <- NDVI_2020_September - NDVI_2020_June
+plot(diff_NDVI_2020, col=cldiff,
+     main = "Difference in normalized vegetation index 2020 \n September and June" ,
+     box = FALSE)
+
+#see the difference between 2018 (June) and 2020 (September)
+diff_NDVI_2018_2020 <- NDVI_2020_September - NDVI_2018_June
+plot(diff_NDVI_2018_2020, col=cldiff,  
+     main = "Difference in normalized vegetation index \n 2020 - 2018" ,
+     box = FALSE)
 
 #DVI = NIR- red : Difference Vegetation Index ->Stressed plants have very low value of difference vegetation index 
-DVI_2018_June <- (images_2018_June_br[[8]] - images_2018_June_br[[4]])
-DVI_2018_August <- (images_2018_August_br[[8]] - images_2018_August_br[[4]])
-DVI_2020_June <- (images_2020_June_br[[8]] - images_2020_June_br[[4]])
-DVI_2020_August <- (images_2020_August_br[[8]] - images_2020_August_br[[4]])
+DVI_2018_June <- (images_2018_June_crop[[8]] - images_2018_June_crop[[4]])
+DVI_2018_September <- (images_2018_September_crop[[8]] - images_2018_September_crop[[4]])
+DVI_2020_June <- (images_2020_June_crop[[8]] - images_2020_June_crop[[4]])
+DVI_2020_September <- (images_2020_September_crop[[8]] - images_2020_September_crop[[4]])
 
-#see the difference between before and after the summer period - 2018
-diff_DVI_2018 <- DVI_2018_August - DVI_2018_June
+#see the difference between June and September - 2018
+diff_DVI_2018 <- DVI_2018_September - DVI_2018_June
 cldiff<- colorRampPalette(c("lightblue", "lightyellow", "red"))(100)
 plot(diff_DVI_2018, col=cldiff,
-     main = "Difference in vegetation index 2018 \n August and June" ,
-     axes = FALSE, box = FALSE)
-# xlim = c(400, 1000), ylim = c(0,600)
+     main = "Difference in vegetation index 2018 \n September - June" ,
+     box = FALSE)
 
-#see the difference between before and after the summer period - 2020
-diff_DVI_2020 <- DVI_2020_August - DVI_2020_June
+#see the difference between June and September - 2020
+diff_DVI_2020 <- DVI_2020_September - DVI_2020_June
 plot(diff_DVI_2020, col=cldiff,
-     main = "Difference in vegetation index 2020 \n August and June" ,
-    box = FALSE)
-# axes = FALSE, xlim = c(400, 1000), ylim = c(0,600)
+     main = "Difference in vegetation index 2020 \n September - June" ,
+     box = FALSE)
 
-#see the difference between 2018 and 2020
-diff_DVI_2018_2020 <- DVI_2020_August - DVI_2018_August
+#see the difference between 2018 (June) and 2020 (September)
+diff_DVI_2018_2020 <- DVI_2020_September - DVI_2018_June
 plot(diff_DVI_2018_2020, col=cldiff,  
-     main = "Difference in vegetation index \n August 2020 and 2018" ,
-     xlim = c(400, 1000), ylim = c(0,600),
+     main = "Difference in vegetation index \n  2020 - 2018" ,
      box = FALSE)
 
 
-# Zoom 
+# NBR= normalized burned ratio 
+# 2018
+NBR_June_2018 <-  (images_2018_June_crop[[8]] - images_2018_June_crop[[12]])/ (images_2018_June_crop[[8]] + images_2018_June_crop[[12]])
+NBR_September_2018 <-  (images_2018_September_crop[[8]] - images_2018_September_crop[[12]])/ (images_2018_September_crop[[8]] + images_2018_September_crop[[12]])
+diff_NBR_2018 <- NBR_September_2018 - NBR_June_2018
+plot(diff_NBR_2018, col=cldiff, 
+     main = "Difference in NBR\n  June - September 2018" ,
+     box = FALSE)
 
-# I don't need a resample because the bands have the same resolution
-May2020 <- stack(import)
-ext <- c(662000, 680000, 4710000, 4730000) # set the coordinates of the Park
-Parcomay <- crop(May2020, ext) # create a new image of the zoomed area
+#2020
+NBR_June_2020 <-  (images_2020_June_crop[[8]] - images_2020_June_crop[[12]])/ (images_2020_June_crop[[8]] + images_2020_June_crop[[12]])
+NBR_September_2020 <-  (images_2020_September_crop[[8]] - images_2020_September_crop[[12]])/ (images_2020_September_crop[[8]] + images_2020_September_crop[[12]])
+diff_NBR_2020 <- NBR_September_2020 - NBR_June_2020
+plot(diff_NBR_2020, col=cldiff,
+     main = "Difference in NBR\n  June - September 2020" ,
+     box = FALSE)
+
+#2018-2020
+diff_NBR_2018_2020 <- NBR_September_2020 - NBR_June_2018
+plot(diff_NBR_2018_2020, col=cldiff,
+     main = "Difference in NBR\n  2018 - 2020" ,
+     box = FALSE)
+
+# Classify the Burn Severity map
+# colour obtain the burn severity map, it is necessary to classify difference_NBR. §
+# The classification should be conducted in accordance with the USGS burn severity standards.
+
+# scales the dNBR map by 10^3
+diff_NBR_2018_scaled <- 1000*diff_NBR_2018
+# sets the ranges that will be used to classify dNBR information about the ranges used, please see the NBR section on the recommended practice
+NBR_ranges <- c(-Inf, -500, -1, -500, -251, 1, -251, -101, 2, -101, 99, 3, 99, 269, 4, 269, 439, 5, 439, 659, 6, 659, 1300, 7, 1300, +Inf, -1) 
+# sets a classification matrix
+class.matrix <- matrix(NBR_ranges, ncol = 3, byrow = TRUE)
+# classification matrix is used to classify diff_NBR_2018_scaled
+diff_NBR_2018_reclass <- reclassify(diff_NBR_2018_scaled, class.matrix, right=NA)
+# Building the legend
+# Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
+# builds the attribute table for the legend 
+diff_NBR_2018_reclass <- ratify(diff_NBR_2018_reclass) 
+rat <- levels(diff_NBR_2018_reclass)[[1]]
+# creates the text that will be on the legend
+rat$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
+levels(diff_NBR_2018_reclass) <- rat 
+# change the default colors : setting the colors for the severity map
+my_col=c("white", "darkolivegreen","darkolivegreen4","limegreen", "yellow2", "orange2", "red", "purple")
+# plots the burn severity map 
+plot(diff_NBR_2018_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018") 
+# plots the legend on the right side of the burn severity map
+legend(x='right', legend =rat$legend, fill = my_col, y='right') 
 
 
-# Quantitative estimation
-# plot!
-plot(ndvi_park_june, ndvi_park_july)
-abline(0,1, col="red") # y=a+bx
-################fino a qui
+
+
+######### 2020
+# scales the dNBR map by 10^3
+diff_NBR_2020_scaled <- 1000*diff_NBR_2020
+# sets the ranges that will be used to classify dNBR information about the ranges used, please see the NBR section on the recommended practice
+NBR_ranges <- c(-Inf, -500, -1, -500, -251, 1, -251, -101, 2, -101, 99, 3, 99, 269, 4, 269, 439, 5, 439, 659, 6, 659, 1300, 7, 1300, +Inf, -1) 
+# sets a classification matrix
+class.matrix <- matrix(NBR_ranges, ncol = 3, byrow = TRUE)
+# classification matrix is used to classify diff_NBR_2020_scaled
+diff_NBR_2020_reclass <- reclassify(diff_NBR_2020_scaled, class.matrix, right=NA)
+# Building the legend
+# Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
+# builds the attribute table for the legend 
+diff_NBR_2020_reclass <- ratify(diff_NBR_2020_reclass) 
+rat <- levels(diff_NBR_2020_reclass)[[1]]
+# creates the text that will be on the legend
+rat$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
+levels(diff_NBR_2020_reclass) <- rat 
+# change the default colors : setting the colors for the severity map
+my_col=c("white", "darkolivegreen","darkolivegreen4","limegreen", "yellow2", "orange2", "red", "purple")
+# plots the burn severity map 
+plot(diff_NBR_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2020") 
+# plots the legend on the right side of the burn severity map
+legend(x='right', legend =rat$legend, fill = my_col, y='right') 
+
+######### 2018-2020
+# scales the dNBR map by 10^3
+diff_NBR_2018_2020_scaled <- 1000*diff_NBR_2018_2020
+# sets the ranges that will be used to classify dNBR information about the ranges used, please see the NBR section on the recommended practice
+NBR_ranges <- c(-Inf, -500, -1, -500, -251, 1, -251, -101, 2, -101, 99, 3, 99, 269, 4, 269, 439, 5, 439, 659, 6, 659, 1300, 7, 1300, +Inf, -1) 
+# sets a classification matrix
+class.matrix <- matrix(NBR_ranges, ncol = 3, byrow = TRUE)
+# classification matrix is used to classify diff_NBR_2020_scaled
+diff_NBR_2018_2020_reclass <- reclassify(diff_NBR_2018_2020_scaled, class.matrix, right=NA)
+# Building the legend
+# Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
+# builds the attribute table for the legend 
+diff_NBR_2018_2020_reclass <- ratify(diff_NBR_2018_2020_reclass) 
+rat <- levels(diff_NBR_2018_2020_reclass)[[1]]
+# creates the text that will be on the legend
+rat$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
+levels(diff_NBR_2020_reclass) <- rat 
+# change the default colors : setting the colors for the severity map
+my_col=c("white", "darkolivegreen","darkolivegreen4","limegreen", "yellow2", "orange2", "red", "purple")
+# plots the burn severity map 
+plot(diff_NBR_2018_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018-2020") 
+# plots the legend on the right side of the burn severity map
+legend(x='right', legend =rat$legend, fill = my_col, y='right')
 
 
 
-
-
-
-
-
-
-# 1. temperature --> see if change through the time 
-#                    scaricare ogni mese per 7 anni 
-#                    media annuale -> plot per vedere l'andamento dal 2014 al 2020
-
-
-# 2. vegetation cover --> Fraction of green Vegetation Cover
-#                         The Fraction of Vegetation Cover (FCover) corresponds to the fraction of ground covered by green vegetation. 
-#                         Practically, it quantifies the spatial extent of the vegetation. 
-#                         Because it is independent from the illumination direction and it is sensitive to the vegetation amount, 
-#                         FCover is a very good candidate for the replacement of classical vegetation indices for the monitoring of ecosystems.
-#                    scaricare ogni mese per 4 anni   
-#                    media annuale -> plot per vedere l'andamento dal 2017 al 2020
-# 3. plot RGB e NIR 
-# 4. vedo effetti di questi cambiamenti
 
 
 ######################################### data of LAND TEMPERATURE : import file efrom earthdata.nasa.gov     
