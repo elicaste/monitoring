@@ -11,7 +11,8 @@ install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
 install.packages("RasterLayer")
-install.packages("rLandsat8")
+install.packages("ggplot2")# to plot better images 
+install.packages("gridExtra") # to plot together different images
 
 # load the packages in the library 
 library(raster)
@@ -23,8 +24,8 @@ library(RStoolbox)
 library(gdalUtils) #to convert hdf file 
 library(plot.matrix)
 library(RasterLayer)
-library(rgeos)
-library(RColorBrewer)
+library(ggplot2)
+library(gridExtra)
 
 ######################################### RGB and NDVI analysis 
 #create a list of raster layers to use (for 2018- June and September, and for 2020- June and September)
@@ -66,37 +67,25 @@ images_2020_September <- stack(import_images_2020_September)
 images_2020_September_crop <- crop(images_2020_September, ext)
 
 # plot in RGB visible 2018 images
-par(mfrow=c(2,1))
-plotRGB(images_2018_June_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "June 2018", 
-        axes = TRUE)
-plotRGB(images_2018_September_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "September 2018", 
-        axes = TRUE) 
+visible_June_2018<- ggRGB(images_2018_June_crop, r=4, g=3, b=2,stretch = "Lin") 
+visible_June_2018_print<- print(visible_June_2018 + ggtitle("Visible June 2018")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+visible_September_2018<- ggRGB(images_2018_September_crop, r=4, g=3, b=2,stretch = "Lin")
+visible_September_2018_print<- print(visible_September_2018 + ggtitle("Visible September 2018")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+
+  #plot June and September 2018 together
+grid.arrange(visible_June_2018_print, visible_September_2018_print,  nrow = 1)
 
 # plot in RGB visible 2020 images
-par(mfrow=c(2,1))
-plotRGB(images_2020_June_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "June 2020", 
-        axes = TRUE)
-plotRGB(images_2020_September_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "September 2020", 
-        axes = TRUE)
+visible_June_2020<- ggRGB(images_2020_June_crop, r=4, g=3, b=2,stretch = "Lin") 
+visible_June_2020_print<- print(visible_June_2020 + ggtitle("Visible June 2020")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+visible_September_2020<- ggRGB(images_2020_September_crop, r=4, g=3, b=2,stretch = "Lin")
+visible_September_2020_print<- print(visible_September_2020 + ggtitle("Visible September 2020")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
 
-#plot all the images together
-par(mfrow=c(2,2))
-  plotRGB(images_2018_June_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "June 2018", 
-        axes = TRUE)
-  plotRGB(images_2018_September_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "September 2018", 
-        axes = TRUE) 
-  plotRGB(images_2020_June_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "June 2020", 
-        axes = TRUE)
-  plotRGB(images_2020_September_crop, r=4, g=3, b=2, stretch="Lin", 
-        main = "September 2020", 
-        axes = TRUE)
+  #plot June and September 2020 together
+grid.arrange(visible_June_2020_print, visible_September_2020_print,  nrow = 1)
+
+  #plot all the images - 2018 and 2020 - together
+grid.arrange(visible_June_2018_print, visible_September_2018_print, visible_June_2020_print, visible_September_2020_print,  ncol= 2, nrow = 2)
 
 #RGB (8,4,3)
 #False color imagery is displayed in a combination of standard near infra-red, red and green band.
@@ -105,14 +94,20 @@ par(mfrow=c(2,2))
 #Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
 
 # plot in false color 2018 images
-par(mfrow=c(1,3))
-  falsecolor_2018_June<- plotRGB(images_2018_June_crop, r=8, g=4, b=3, stretch="Lin", main = "June 2018" )
-  falsecolor_2018_September<- plotRGB(images_2018_September_crop, r=8, g=4, b=3, stretch="Lin", main = "September 2018") 
+false_June_2018<- ggRGB(images_2018_June_crop, r=8, g=4, b=3,stretch = "Lin") 
+false_June_2018_print<- print(false_June_2018 + ggtitle("False color June 2018")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+false_September_2018<- ggRGB(images_2018_September_crop, r=8, g=4, b=3,stretch = "Lin")
+false_September_2018_print<- print(false_September_2018 + ggtitle("False color September 2018")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+
+grid.arrange(false_June_2018_print, false_September_2018_print,  nrow = 1)
 
 # plot in false color 2020 images
-par(mfrow=c(1,3))
-  falsecolor_2020_June<- plotRGB(images_2020_June_crop, r=8, g=4, b=3, stretch="Lin", main = "June 2020", axes=TRUE )
-  falsecolor_2020_September<- plotRGB(images_2020_September_crop, r=8, g=4, b=3, stretch="Lin", main = "September 2020", axes=TRUE) 
+false_June_2020<- ggRGB(images_2020_June_crop, r=8, g=4, b=3,stretch = "Lin") 
+false_June_2020_print<- print(false_June_2020 + ggtitle("False color June 2020")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+false_September_2020<- ggRGB(images_2020_September_crop, r=8, g=4, b=3,stretch = "Lin")
+false_September_2020_print<- print(false_September_2020 + ggtitle("False color September 2020")+ theme (axis.title.x = element_blank(),axis.title.y = element_blank()))
+
+grid.arrange(false_June_2020_print, false_September_2020_print,  nrow = 1)
 
 # NDVI anlysis
 #The normalized difference vegetation index (NDVI) uses a ratio between near infrared and red light within the electromagnetic spectrum. 
