@@ -6,8 +6,6 @@ install.packages ("raster") #package for the analysis and geographyc data manipu
 install.packages("rasterdiv")
 install.packages ("rasterVis") #package for visualize raster data 
 install.packages ("rgdal") #package for geospatial analysis 
-install.packages("ncdf4") #package for netcdf manipulation
-install.packages("rgdal")
 install.packages("RStoolbox")
 install.packages("gdalUtils")
 install.packages("RasterLayer")
@@ -21,7 +19,6 @@ library(rasterVis)
 library(ncdf4) 
 library(rgdal)
 library(RStoolbox)
-library(gdalUtils) #to convert hdf file 
 library(plot.matrix)
 library(RasterLayer)
 library(ggplot2)
@@ -208,84 +205,84 @@ plot(NDVI_2020_September_mod, main='Vegetation \n September 2020', axes=FALSE, b
 # 2018
 NBR_June_2018 <-  (images_2018_June_crop[[8]] - images_2018_June_crop[[12]])/ (images_2018_June_crop[[8]] + images_2018_June_crop[[12]])
 NBR_September_2018 <-  (images_2018_September_crop[[8]] - images_2018_September_crop[[12]])/ (images_2018_September_crop[[8]] + images_2018_September_crop[[12]])
-diff_NBR_2018 <- NBR_September_2018 - NBR_June_2018
-plot(diff_NBR_2018, 
+dNBR_2018 <-  NBR_June_2018 - NBR_September_2018
+plot(dNBR_2018, 
      main = "Difference in NBR\n  June - September 2018" ,
      box = FALSE)
 
 #2020
 NBR_June_2020 <-  (images_2020_June_crop[[8]] - images_2020_June_crop[[12]])/ (images_2020_June_crop[[8]] + images_2020_June_crop[[12]])
 NBR_September_2020 <-  (images_2020_September_crop[[8]] - images_2020_September_crop[[12]])/ (images_2020_September_crop[[8]] + images_2020_September_crop[[12]])
-diff_NBR_2020 <- NBR_September_2020 - NBR_June_2020
-plot(diff_NBR_2020,
+dNBR_2020 <-  NBR_June_2020-NBR_September_2020 
+plot(dNBR_2020,
      main = "Difference in NBR\n  June - September 2020" ,
      box = FALSE)
 
 #2018-2020
-diff_NBR_2018_2020 <- NBR_September_2020 - NBR_June_2018
-plot(diff_NBR_2018_2020,main = "Difference in NBR\n  2018 - 2020", box = FALSE)
+dNBR_2018_2020 <-  NBR_June_2018-NBR_September_2020 
+plot(dNBR_2018_2020,main = "Difference in NBR\n  2018 - 2020", box = FALSE)
 
-# BURNE SEVERITY MAP: colour obtain the burn severity map, it is necessary to classify difference_NBR.
+# BURN SEVERITY MAP: colour obtain the burn severity map, it is necessary to classify difference_NBR.
 # The classification should be conducted in accordance with the USGS burn severity standards.
 
 #   2018 
 # scales the dNBR map by 10^3
-diff_NBR_2018_scaled <- 1000*diff_NBR_2018
+dNBR_2018_scaled <- 1000*dNBR_2018
 # sets the ranges that will be used to classify dNBR information about the ranges used, please see the NBR section on the recommended practice
 NBR_ranges <- c(-Inf, -500, -1, -500, -251, 1, -251, -101, 2, -101, 99, 3, 99, 269, 4, 269, 439, 5, 439, 659, 6, 659, 1300, 7, 1300, +Inf, -1) 
 # sets a classification matrix
 class.matrix <- matrix(NBR_ranges, ncol = 3, byrow = TRUE)
-# classification matrix is used to classify diff_NBR_2018_scaled
-diff_NBR_2018_reclass <- reclassify(diff_NBR_2018_scaled, class.matrix, right=NA)
+# classification matrix is used to classify dNBR_2018_scaled
+dNBR_2018_reclass <- reclassify(dNBR_2018_scaled, class.matrix, right=NA)
 # Building the legend
 # Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
 # builds the attribute table for the legend 
-diff_NBR_2018_reclass <- ratify(diff_NBR_2018_reclass) 
-rat2018 <- levels(diff_NBR_2018_reclass)[[1]]
+dNBR_2018_reclass <- ratify(dNBR_2018_reclass) 
+rat2018 <- levels(dNBR_2018_reclass)[[1]]
 # creates the text that will be on the legend
 rat2018$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
-levels(diff_NBR_2018_reclass) <- rat2018 
+levels(dNBR_2018_reclass) <- rat2018 
 # change the default colors : setting the colors for the severity map
 my_col=c("white", "darkolivegreen","darkolivegreen4","limegreen", "yellow2", "orange2", "red", "purple")
 # plots the burn severity map 
-plot(diff_NBR_2018_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018") 
+plot(dNBR_2018_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018") 
 # plots the legend on the right side of the burn severity map
 legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75) 
 
 #   2020
 
-diff_NBR_2020_scaled <- 1000*diff_NBR_2020
-# classification matrix is used to classify diff_NBR_2020_scaled
-diff_NBR_2020_reclass <- reclassify(diff_NBR_2020_scaled, class.matrix, right=NA)
+dNBR_2020_scaled <- 1000*dNBR_2020
+# classification matrix is used to classify dNBR_2020_scaled
+dNBR_2020_reclass <- reclassify(dNBR_2020_scaled, class.matrix, right=NA)
 # Building the legend
 # Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
 # builds the attribute table for the legend 
-diff_NBR_2020_reclass <- ratify(diff_NBR_2020_reclass) 
-rat2020 <- levels(diff_NBR_2020_reclass)[[1]]
+dNBR_2020_reclass <- ratify(dNBR_2020_reclass) 
+rat2020 <- levels(dNBR_2020_reclass)[[1]]
 # creates the text that will be on the legend
 rat2020$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
-levels(diff_NBR_2020_reclass) <- rat2020 
+levels(dNBR_2020_reclass) <- rat2020 
 
 # plots the burn severity map 
-plot(diff_NBR_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2020") 
+plot(dNBR_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2020") 
 # plots the legend on the right side of the burn severity map
 legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75)
 
 #   2018-2020
-diff_NBR_2018_2020_scaled <- 1000*diff_NBR_2018_2020
-# classification matrix is used to classify diff_NBR_2018_2020_scaled
-diff_NBR_2018_2020_reclass <- reclassify(diff_NBR_2018_2020_scaled, class.matrix, right=NA)
+dNBR_2018_2020_scaled <- 1000*dNBR_2018_2020
+# classification matrix is used to classify dNBR_2018_2020_scaled
+dNBR_2018_2020_reclass <- reclassify(dNBR_2018_2020_scaled, class.matrix, right=NA)
 # Building the legend
 # Now that the burn severity map has been generated, the legend for the burn severity classes also needs to be created. 
 # builds the attribute table for the legend 
-diff_NBR_2018_2020_reclass <- ratify(diff_NBR_2018_2020_reclass) 
-rat2018_2020 <- levels(diff_NBR_2018_2020_reclass)[[1]]
+dNBR_2018_2020_reclass <- ratify(dNBR_2018_2020_reclass) 
+rat2018_2020 <- levels(dNBR_2018_2020_reclass)[[1]]
 # creates the text that will be on the legend
 rat2018_2020$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
-levels(diff_NBR_2018_2020_reclass) <- rat2018_2020 
+levels(dNBR_2018_2020_reclass) <- rat2018_2020 
 
 # plots the burn severity map 
-plot(diff_NBR_2018_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018 - 2020") 
+plot(dNBR_2018_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018 - 2020") 
 # plots the legend on the right side of the burn severity map
 legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75)
 
