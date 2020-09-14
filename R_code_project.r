@@ -208,6 +208,25 @@ NBR_September_2018 <-  (images_2018_September_crop[[8]] - images_2018_September_
 #2020 NBR
 NBR_June_2020 <-  (images_2020_June_crop[[8]] - images_2020_June_crop[[12]])/ (images_2020_June_crop[[8]] + images_2020_June_crop[[12]])
 NBR_September_2020 <-  (images_2020_September_crop[[8]] - images_2020_September_crop[[12]])/ (images_2020_September_crop[[8]] + images_2020_September_crop[[12]])
+# visualize NBR rasters before and after the fire.
+# Define color palette
+nbr_colors <- colorRampPalette(brewer.pal(11, "RdYlGn"))(100) 
+# Define in how many rows and columns are the graphs plotted
+par(mfrow=c(1,2))
+
+# Plot
+plot(nbr_pre,
+     main = "Landsat derived NBR\n Pre-Fire",
+     axes = FALSE,
+     box = FALSE,
+     col = nbr_colors,
+     zlim = c(-1, 1))
+plot(nbr_post,
+     main = "Landsat derived NBR\n Post-Fire",
+     axes = FALSE,
+     box = FALSE,
+     col = nbr_colors,
+     zlim = c(-1, 1))
 # dNBR 2018
 dNBR_2018 <-  NBR_June_2018 - NBR_September_2018
 plot(dNBR_2018, 
@@ -218,9 +237,7 @@ dNBR_2020 <-  NBR_June_2020-NBR_September_2020
 plot(dNBR_2020,
      main = "Difference in NBR\n  June - September 2020" ,
      box = FALSE)
-# dNBR 2018-2020
-dNBR_2018_2020 <-  NBR_June_2018-NBR_September_2020 
-plot(dNBR_2018_2020,main = "Difference in NBR\n  2018 - 2020", box = FALSE)
+
 
 # BURN SEVERITY MAP: colour obtain the burn severity map, it is necessary to classify difference_NBR.
 # The classification should be conducted in accordance with the USGS burn severity standards.
@@ -278,7 +295,6 @@ rat2018_2020 <- levels(dNBR_2018_2020_reclass)[[1]]
 # creates the text that will be on the legend
 rat2018_2020$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
 levels(dNBR_2018_2020_reclass) <- rat2018_2020 
-
 # plots the burn severity map 
 plot(dNBR_2018_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018 - 2020") 
 # plots the legend on the right side of the burn severity map
@@ -286,11 +302,21 @@ legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), n
 
 # distribution classified NBR values 
 barplot(dNBR_2018_reclass,
-        main = "Distribution of classified NBR Values \n 2018",
+        main = "Distribution of Classified NBR Values \n 2018",
         col = my_col,
-        names.arg = c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity"), 
+        names.arg = c("NA", "RegrHigh", "RegrLow", "Unburned", "LowSev", "ModLowSev", "ModHighSev", "HighSev"), 
+        horiz=TRUE,
         las=2,
         maxpixels= 2807500)
+barplot(dNBR_2020_reclass,
+        main = "Distribution of Classified NBR Values \n 2020",
+        col = my_col,
+        names.arg = c("NA", "RegrHigh", "RegrLow", "Unburned", "LowSev", "ModLowSev", "ModHighSev", "HighSev"), 
+        horiz=TRUE,
+        las=2,
+        maxpixels= 2807500)
+
+
 
 
 
