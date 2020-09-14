@@ -34,7 +34,7 @@ rlist_2018_June
 import_images_2018_June <- lapply(rlist_2018_June, raster)
 images_2018_June <- stack(import_images_2018_June)
 #crop the images 
-ext <- c(0, 2500, 0, 1300)
+ext <- c(0, 2500, 0, 100)
 #zoom function
 zoom(images_2018_June, ext=ext)
 images_2018_June_crop <- crop(images_2018_June, ext)
@@ -148,17 +148,16 @@ plot(diff_NDVI_2018_2020, col=cldiff,
      main = "Difference in normalized vegetation index \n 2020 - 2018" ,
      box = FALSE)
 
-
 # histogram NDVI Juned 2018
 hist_NDVI_2018_June <-hist(NDVI_2018_June, main = "Distribution of NDVI values \n June 2018",	xlab = "NDVI", ylab= "Frequency", breaks=30)  
 axis(side=1, at = seq(-0.5,1, 0.05), labels = seq(-0.5,1, 0.05))
 
 # histogram NDVI September 2018
-hist_NDVI_2018_September <- hist(NDVI_2018_September, main = "Distribution of NDVI values \n September  2018",xlab = "NDVI", ylab= "Frequency", breaks=30, ylim=25000 )
+hist_NDVI_2018_September <- hist(NDVI_2018_September, main = "Distribution of NDVI values \n September  2018",xlab = "NDVI", ylab= "Frequency", breaks=30)
 axis(side=1, at = seq(-0.5,1, 0.05), labels = seq(-0.5,1, 0.05))
 
 # histogram NDVI Juned 2020
-hist_NDVI_2020_June <-	hist(NDVI_2020_June, main = "Distribution of NDVI values \n June 2020",		 xlab = "NDVI", ylab= "Frequency", breaks=30, )
+hist_NDVI_2020_June <-	hist(NDVI_2020_June, main = "Distribution of NDVI values \n June 2020",	xlab = "NDVI", ylab= "Frequency", breaks=30, )
 axis(side=1, at = seq(-0.5,1, 0.05), labels = seq(-0.5,1, 0.05))
 
 # histogram NDVI September 2020
@@ -185,8 +184,8 @@ par(mai=rep(0.5, 4))
 layout(matrix(c(1,1,2,2,0,3,3,0), ncol = 4, byrow = TRUE))
 plot(hist_NDVI_2020_June, col=c2, main="NDVI June 2020", xlab = "NDVI")
 plot(hist_NDVI_2020_September, col=c1, main="NDVI September 2020", xlab = "NDVI")
-plot(hist_NDVI_2020_September, col = c1, xlim = c(-0.5, 1), ylim = c(0,130000), main="Comparison between 2020 NDVI",xlab = "NDVI" )
-plot(hist_NDVI_2020_June, add = TRUE, col = c2)
+plot(hist_NDVI_2020_June, col = c1, xlim = c(-0.5, 1), main="Comparison between 2020 NDVI",xlab = "NDVI" )
+plot(hist_NDVI_2020_September, add = TRUE, col = c2)
 
 #  remove cells where NDVI < 0,4
 NDVI_2018_June_mod <- reclassify(NDVI_2018_June, cbind(-Inf, 0.4, NA))
@@ -202,31 +201,33 @@ plot(NDVI_2020_June_mod, main='Vegetation \n June 2020', axes=FALSE, box=FALSE)
 plot(NDVI_2020_September_mod, main='Vegetation \n September 2020', axes=FALSE, box=FALSE)
 
 # NBR= normalized burned ratio 
-# 2018 NBR
+# NBR 2018
 NBR_June_2018 <-  (images_2018_June_crop[[8]] - images_2018_June_crop[[12]])/ (images_2018_June_crop[[8]] + images_2018_June_crop[[12]])
 NBR_September_2018 <-  (images_2018_September_crop[[8]] - images_2018_September_crop[[12]])/ (images_2018_September_crop[[8]] + images_2018_September_crop[[12]])
-#2020 NBR
+# NBR 2020
 NBR_June_2020 <-  (images_2020_June_crop[[8]] - images_2020_June_crop[[12]])/ (images_2020_June_crop[[8]] + images_2020_June_crop[[12]])
 NBR_September_2020 <-  (images_2020_September_crop[[8]] - images_2020_September_crop[[12]])/ (images_2020_September_crop[[8]] + images_2020_September_crop[[12]])
-# visualize NBR rasters before and after the fire.
-# Define color palette
-nbr_colors <- colorRampPalette(brewer.pal(11, "RdYlGn"))(100) 
-# Define in how many rows and columns are the graphs plotted
-par(mfrow=c(1,2))
 
-# Plot
-plot(nbr_pre,
-     main = "Landsat derived NBR\n Pre-Fire",
+
+# color palette NBR
+nbr_colors <- colorRampPalette(c("black" ,"white"))(100)
+
+# Define in how many rows and columns are the graphs plotted
+par(mfrow=c(2,1))
+# Plot NBR 2018
+plot(NBR_June_2018,
+     main = "NBR June 2018",
      axes = FALSE,
      box = FALSE,
      col = nbr_colors,
      zlim = c(-1, 1))
-plot(nbr_post,
-     main = "Landsat derived NBR\n Post-Fire",
+plot(NBR_September_2018,
+     main = "NBR September 2018",
      axes = FALSE,
      box = FALSE,
      col = nbr_colors,
      zlim = c(-1, 1))
+
 # dNBR 2018
 dNBR_2018 <-  NBR_June_2018 - NBR_September_2018
 plot(dNBR_2018, 
@@ -238,6 +239,9 @@ plot(dNBR_2020,
      main = "Difference in NBR\n  June - September 2020" ,
      box = FALSE)
 
+# dNBR 2018-2020
+dNBR_2018_2020 <-  NBR_June_2018-NBR_September_2020 
+plot(dNBR_2018_2020,main = "Difference in NBR\n  2018 - 2020", box = FALSE)
 
 # BURN SEVERITY MAP: colour obtain the burn severity map, it is necessary to classify difference_NBR.
 # The classification should be conducted in accordance with the USGS burn severity standards.
@@ -264,7 +268,7 @@ my_col=c("white", "darkolivegreen","darkolivegreen4","limegreen", "yellow2", "or
 # plots the burn severity map 
 plot(dNBR_2018_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018") 
 # plots the legend on the right side of the burn severity map
-legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75) 
+legend(x="top" ,legend =rat2018$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75) 
 
 #   2020
 
@@ -284,23 +288,7 @@ plot(dNBR_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 202
 # plots the legend on the right side of the burn severity map
 legend(x="top" ,legend =rat2020$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75)
 
-#   2018-2020
-dNBR_2018_2020_scaled <- 1000*dNBR_2018_2020
-# classification matrix is used to classify dNBR_2018_2020_scaled
-dNBR_2018_2020_reclass <- reclassify(dNBR_2018_2020_scaled, class.matrix, right=NA)
-
-# build the legend
-dNBR_2018_2020_reclass <- ratify(dNBR_2018_2020_reclass) 
-rat2018_2020 <- levels(dNBR_2018_2020_reclass)[[1]]
-# creates the text that will be on the legend
-rat2018_2020$legend  <- c("NA", "Enhanced Regrowth, High", "Enhanced Regrowth, Low", "Unburned", "Low Severity", "Moderate-low Severity", "Moderate-high Severity", "High Severity") 
-levels(dNBR_2018_2020_reclass) <- rat2018_2020 
-# plots the burn severity map 
-plot(dNBR_2018_2020_reclass,col=my_col,legend=F,box=F,axes=F, main="Burn Severity 2018 - 2020") 
-# plots the legend on the right side of the burn severity map
-legend(x="top" ,legend =rat$legend, fill = my_col, y='right', inset=c(-0.2,0), ncol=3, cex = 0.75)
-
-# distribution classified NBR values 
+# It's possible to make a distribution of the classified NBR values from the previous raster
 barplot(dNBR_2018_reclass,
         main = "Distribution of Classified NBR Values \n 2018",
         col = my_col,
@@ -315,8 +303,5 @@ barplot(dNBR_2020_reclass,
         horiz=TRUE,
         las=2,
         maxpixels= 2807500)
-
-
-
 
 
