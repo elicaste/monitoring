@@ -1,32 +1,29 @@
 #R_code_project.r
-setwd("C:/lab/California") #set the working director
+setwd("C:/lab/California") #set the working directory
 
 # install all packages needed 
-install.packages ("raster") #package for the analysis and geographyc data manipulation 
-install.packages("rasterdiv")
-install.packages ("rasterVis") #package for visualize raster data 
-install.packages ("rgdal") #package for geospatial analysis 
-install.packages("RStoolbox")
-install.packages("gdalUtils")
-install.packages("RasterLayer")
-install.packages("ggplot2")# to plot better images 
+install.packages ("raster") #analysis and geographyc data manipulation 
+install.packages("rasterdiv") # diversity based Raster Data
+install.packages ("rasterVis") #visualize raster data 
+install.packages ("rgdal") #geospatial analysis 
+install.packages("RStoolbox") #for remote sensing image, processing and analysis such as calculating spectral indices, principal component transformation
+install.packages("ggplot2") #to better plot images 
 install.packages("gridExtra") # to plot together different images
+
 
 # load the packages in the library 
 library(raster)
 library(rasterdiv)
-library(rasterVis)
-library(ncdf4) 
+library(rasterVis) 
 library(rgdal)
 library(RStoolbox)
-library(plot.matrix)
-library(RasterLayer)
 library(ggplot2)
 library(gridExtra)
 
-######################################### RGB and NDVI analysis 
-#create a list of raster layers to use (for 2018- June and September, and for 2020- June and September)
 
+###### ANALYSIS 
+
+#create a list of raster layers to use (for 2018- June and September, and for 2020- June and September)
 #import 2018_June images
 setwd("C:/lab/California/2018_14_June")
 rlist_2018_June<- list.files(pattern="2018")
@@ -34,7 +31,7 @@ rlist_2018_June
 import_images_2018_June <- lapply(rlist_2018_June, raster)
 images_2018_June <- stack(import_images_2018_June)
 #crop the images 
-ext <- c(0, 2500, 0, 100)
+ext <- c(0, 2500, 0, 1300)
 #zoom function
 zoom(images_2018_June, ext=ext)
 images_2018_June_crop <- crop(images_2018_June, ext)
@@ -84,11 +81,7 @@ grid.arrange(visible_June_2020_print, visible_September_2020_print,  ncol = 1)
 #plot all the images - 2018 and 2020 - together
 grid.arrange(visible_June_2018_print, visible_September_2018_print, visible_June_2020_print, visible_September_2020_print,  ncol= 2, nrow = 2)
 
-#RGB (8,4,3)
-#False color imagery is displayed in a combination of standard near infra-red, red and green band.
-#It is most commonly used to assess plant density and healht, as plants reflect near infrared and green light, while absorbing red. 
-#Since they reflect more near infrared than green, plant-covered land appears deep red. 
-#Denser plant growth is darker red. Cities and exposed ground are gray or tan, and water appears blue or black.
+#RGB (8,4,3) - FALSE COLORS
 
 # plot in false color 2018 images
 false_June_2018<- ggRGB(images_2018_June_crop, r=8, g=4, b=3,stretch = "Lin") 
@@ -107,11 +100,6 @@ false_September_2020_print<- print(false_September_2020 + ggtitle("False color S
 grid.arrange(false_June_2020_print, false_September_2020_print,  ncol = 1)
 
 # NDVI anlysis
-#The normalized difference vegetation index (NDVI) uses a ratio between near infrared and red light within the electromagnetic spectrum. 
-#To calculate NDVI, you use the following formula where NIR is near infrared light and red represents red light. 
-#NDVI= (NIR - Red) / (NIR + Red)
-#For your raster data, you will take the reflectance value in the red and near infrared bands to calculate the index.
-
 # calculate NDVI using the red and nir bands
 
 NDVI_2018_June <- (images_2018_June_crop[[8]] - images_2018_June_crop[[4]]) / (images_2018_June_crop[[8]] + images_2018_June_crop[[4]])
@@ -127,27 +115,26 @@ plot(NDVI_2018_September, main = "NDVI  - September 2018",axes = FALSE, box = FA
 plot(NDVI_2020_June, main = "NDVI  - June 2020",axes = FALSE, box = FALSE)
 plot(NDVI_2020_September, main = "NDVI  - September 2020",axes = FALSE, box = FALSE)
 
-
+# I tried to visualize the difference between NDVI, but they have no so much significance
 #see the difference between June and September - 2018
-diff_NDVI_2018 <- NDVI_2018_September - NDVI_2018_June
+#diff_NDVI_2018 <- NDVI_2018_September - NDVI_2018_June
 # color-palette for immages of comparison difference
-cldiff<- colorRampPalette(c("black", "yellow"))(100)
-plot(diff_NDVI_2018, col=cldiff,
-     main = "Difference in normalized vegetation index 2018 \n September and June" ,
-     box = FALSE)
-
+#cldiff<- colorRampPalette(c("black", "yellow"))(100)
+#plot(diff_NDVI_2018, col=cldiff,
+#     main = "Difference in normalized vegetation index 2018 \n September and June" ,
+#     box = FALSE)
 #see the difference between June and September - 2020
-diff_NDVI_2020 <- NDVI_2020_September - NDVI_2020_June
-plot(diff_NDVI_2020, col=cldiff,
-     main = "Difference in normalized vegetation index 2020 \n September and June" ,
-     box = FALSE)
-
+#diff_NDVI_2020 <- NDVI_2020_September - NDVI_2020_June
+#plot(diff_NDVI_2020, col=cldiff,
+#     main = "Difference in normalized vegetation index 2020 \n September and June" ,
+#     box = FALSE)
 #see the difference between 2018 (June) and 2020 (September)
-diff_NDVI_2018_2020 <- NDVI_2020_September - NDVI_2018_June
-plot(diff_NDVI_2018_2020, col=cldiff,  
-     main = "Difference in normalized vegetation index \n 2020 - 2018" ,
-     box = FALSE)
+#diff_NDVI_2018_2020 <- NDVI_2020_September - NDVI_2018_June
+#plot(diff_NDVI_2018_2020, col=cldiff,  
+#     main = "Difference in normalized vegetation index \n 2020 - 2018" ,
+#     box = FALSE)
 
+# so I tried to visualize the differences using histograms thanks to the NDVI classification 
 # histogram NDVI Juned 2018
 hist_NDVI_2018_June <-hist(NDVI_2018_June, main = "Distribution of NDVI values \n June 2018",	xlab = "NDVI", ylab= "Frequency", breaks=30)  
 axis(side=1, at = seq(-0.5,1, 0.05), labels = seq(-0.5,1, 0.05))
@@ -176,8 +163,8 @@ par(mai=rep(0.5, 4))
 layout(matrix(c(1,1,2,2,0,3,3,0), ncol = 4, byrow = TRUE))
 plot(hist_NDVI_2018_June, col=c2, main="NDVI June 2018", xlab = "NDVI")
 plot(hist_NDVI_2018_September, col=c1, main="NDVI September 2018", xlab = "NDVI")
-plot(hist_NDVI_2018_June, col = c1, xlim = c(-0.5, 1), main="Comparison between 2018 NDVI",xlab = "NDVI" )
-plot(hist_NDVI_2018_September , add = TRUE, col = c2)
+plot(hist_NDVI_2018_June, col = c2, xlim = c(-0.5, 1), main="Comparison between 2018 NDVI",xlab = "NDVI" )
+plot(hist_NDVI_2018_September , add = TRUE, col = c1)
 
 # plot the 2020 histograms
 par(mai=rep(0.5, 4))
@@ -185,7 +172,7 @@ layout(matrix(c(1,1,2,2,0,3,3,0), ncol = 4, byrow = TRUE))
 plot(hist_NDVI_2020_June, col=c2, main="NDVI June 2020", xlab = "NDVI")
 plot(hist_NDVI_2020_September, col=c1, main="NDVI September 2020", xlab = "NDVI")
 plot(hist_NDVI_2020_June, col = c1, xlim = c(-0.5, 1), main="Comparison between 2020 NDVI",xlab = "NDVI" )
-plot(hist_NDVI_2020_September, add = TRUE, col = c2)
+plot(hist_NDVI_2020_September, add = TRUE, col = c1)
 
 #  remove cells where NDVI < 0,4
 NDVI_2018_June_mod <- reclassify(NDVI_2018_June, cbind(-Inf, 0.4, NA))
@@ -208,26 +195,6 @@ NBR_September_2018 <-  (images_2018_September_crop[[8]] - images_2018_September_
 NBR_June_2020 <-  (images_2020_June_crop[[8]] - images_2020_June_crop[[12]])/ (images_2020_June_crop[[8]] + images_2020_June_crop[[12]])
 NBR_September_2020 <-  (images_2020_September_crop[[8]] - images_2020_September_crop[[12]])/ (images_2020_September_crop[[8]] + images_2020_September_crop[[12]])
 
-
-# color palette NBR
-nbr_colors <- colorRampPalette(c("black" ,"white"))(100)
-
-# Define in how many rows and columns are the graphs plotted
-par(mfrow=c(2,1))
-# Plot NBR 2018
-plot(NBR_June_2018,
-     main = "NBR June 2018",
-     axes = FALSE,
-     box = FALSE,
-     col = nbr_colors,
-     zlim = c(-1, 1))
-plot(NBR_September_2018,
-     main = "NBR September 2018",
-     axes = FALSE,
-     box = FALSE,
-     col = nbr_colors,
-     zlim = c(-1, 1))
-
 # dNBR 2018
 dNBR_2018 <-  NBR_June_2018 - NBR_September_2018
 plot(dNBR_2018, 
@@ -238,10 +205,6 @@ dNBR_2020 <-  NBR_June_2020-NBR_September_2020
 plot(dNBR_2020,
      main = "Difference in NBR\n  June - September 2020" ,
      box = FALSE)
-
-# dNBR 2018-2020
-dNBR_2018_2020 <-  NBR_June_2018-NBR_September_2020 
-plot(dNBR_2018_2020,main = "Difference in NBR\n  2018 - 2020", box = FALSE)
 
 # BURN SEVERITY MAP: colour obtain the burn severity map, it is necessary to classify difference_NBR.
 # The classification should be conducted in accordance with the USGS burn severity standards.
