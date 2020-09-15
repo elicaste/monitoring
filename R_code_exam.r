@@ -7,7 +7,7 @@
 # 5. R code multivariate analysis 
 # 6. R code remote sensing
 # 7. R code ecosystem function
-# 8. R code pcs remote sensing 
+# 8. R code pca remote sensing 
 # 9. R code radiance
 # 10. R code faPAR
 # 11. R code EBV
@@ -125,7 +125,7 @@ head(mpg)
 #3 component:DATA, set of AESTHETIC MAPPING (variables in the data and visual properties), GEOMETRICAL layer
 ggplot(mpg, aes(x=displ,y=hwy))+geom_point() #(first: data, second: aes(x variable= displ, yvariable) ) + third: geometry: geom_point
 ggplot(mpg, aes(x=displ,y=hwy))+geom_line() #changing in type of graph: linear graph
-ggplot(mpg, aes(x=displ,y=hwy))+geom_polygon() 
+ggplot(mpg, aes(x=displ,y=hwy))+geom_polygon() #polygon geometry
 
 head(covid)
 
@@ -306,8 +306,8 @@ ordispider(multivar, type, col=1:4, label=T)
 setwd("C:/lab/") 
 
 #raster --> rastrum= aratro
-install.packages("raster")
-install.packages("RStoolbox")
+install.packages("raster") # raster is the format with the pixels ( matrices of the row, columns and values)
+install.packages("RStoolbox") # package for remote sensing image, processing and analysis such as calculating spectral indeces, principal component transformation
 library(raster) 
 
 p224r63_2011 <- brick("p224r63_2011_masked.grd") #importe the image 
@@ -335,7 +335,7 @@ par(mfrow=c(2,2)) #number of column and row
 
 # B1: blue band
 clb <- colorRampPalette(c('dark blue','blue','light blue'))(100) 
-plot(p224r63_2011$B1_sre, col=clb)     #$ is used to link every single band to an image
+plot(p224r63_2011$B1_sre, col=clb)     # $ is used to link every single band to an image
 
 # B2: green band
 clb <- colorRampPalette(c('dark green','bgreen','light green'))(100) 
@@ -504,16 +504,16 @@ plotRGB(p224r63_2011res100, r=4, g=3, b=2, stretch="Lin")
 install.packages("rasterdiv") #diversity
 install.packages("rasterVis") #visualization
 
-library(rasterdiv) 
-library(rasterVis) 
+library(rasterdiv) # diversity based Raster Data
+library(rasterVis) # methods for enhanced visualization and interaction with raster data
 
 data(copNDVI) #Copernicus Long-term database
 plot(copNDVI)
 
-copNDVI <- reclassify(copNDVI, cbind(253:255, NA))
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA)) # removing water-based colours -> reclassify: function that reclassify groups of values to other values
 levelplot(copNDVI)               
 
-copNDVI10 <- aggregate (copNDVI, fact=10)
+copNDVI10 <- aggregate (copNDVI, fact=10)# aggregating 10 pixel in 1 
 levelplot(copNDVI10) 
 
 #try to exagerate the aggregation
@@ -574,7 +574,7 @@ hist(difdvi)
 ########################################################################
 ########################################################################
 
-# --------------------------------- 8. R code pcs remote sensing 
+# --------------------------------- 8. R code pca remote sensing 
 
 setwd("/Users/utente/lab")
 library(raster)
@@ -582,7 +582,7 @@ library(RStoolbox)
 library(ggplot2)
 
 
-p224r63_2011 <- brick("p224r63_2011_masked.grd")
+p224r63_2011 <- brick("p224r63_2011_masked.grd") # import the images composed by different layers
 
 #B1 blue
 #B2 green
@@ -702,11 +702,12 @@ library(raster)
 library(rasterVis)
 library(rasterdiv)
 
-plot(copNDVI)
-copNDVI <- reclassify(copNDVI, cbind(253:255, NA))
+plot(copNDVI) # Copernicus NDVI, present in the rasterdiv library
+copNDVI <- reclassify(copNDVI, cbind(253:255, NA)) # remove data from 253 to 255 and put no data as value -> remove water from the analysis
 
 levelplot(copNDVI)
-faPAR10 <- raster("farPAR10.tif") #import the file
+# faPAR: we can see the real power of the forest in keeping carbon
+faPAR10 <- raster("farPAR10.tif") # import the image; faPAR10 because it is aggregate by a fact=10
 
 levelplot(farPAR10)
 
@@ -805,8 +806,8 @@ plot(snt)
 #B4 NIR
 
 #R3 G2 B1
-plotRGB(snt, 3,2,1, stretch="lin")
-plotRGB(snt, 4,3,2, stretch="lin")
+plotRGB(snt, 3,2,1, stretch="lin") # visible colors 
+plotRGB(snt, 4,3,2, stretch="lin") # NIR in top of red: vegetation being coloured in red
 
 pairs(snt) #Scatterplot matrices
 
@@ -890,7 +891,7 @@ q()
 # --------------------------------- 12. R code NO2
 
 setwd("C:/lab/NO2/")
-library(ncdf4)
+library(ncdf4) # # ncdf4 package to read all the netCDF files. All Copernicus data use this extension
 
 #EXERCISE: import all of the NO2 data in R  by the lapply function
 
